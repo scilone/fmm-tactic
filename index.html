@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Football Manager Mobile Team Manager - Manage your squad and starting 11">
+    <meta name="theme-color" content="#1a472a">
+    <title>FMM Tactic Manager</title>
+    <link rel="manifest" href="manifest.json">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="icon" type="image/png" href="icon-192.png">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>⚽ FMM Tactic Manager</h1>
+            <p class="subtitle">Manage your Football Manager Mobile squad</p>
+        </header>
+
+        <nav class="tabs">
+            <button class="tab-btn active" data-tab="squad">Squad</button>
+            <button class="tab-btn" data-tab="lineup">Starting 11</button>
+            <button class="tab-btn" data-tab="add-player">Add Player</button>
+        </nav>
+
+        <!-- Squad Tab -->
+        <div id="squad" class="tab-content active">
+            <div class="section-header">
+                <h2>Your Squad</h2>
+                <div class="squad-stats">
+                    <span id="squad-count">0 players</span>
+                </div>
+            </div>
+            <div class="filters">
+                <select id="position-filter">
+                    <option value="all">All Positions</option>
+                    <option value="GK">Goalkeeper</option>
+                    <option value="DEF">Defender</option>
+                    <option value="MID">Midfielder</option>
+                    <option value="FWD">Forward</option>
+                </select>
+                <input type="text" id="search-player" placeholder="Search players...">
+            </div>
+            <div id="squad-list" class="player-list"></div>
+        </div>
+
+        <!-- Starting 11 Tab -->
+        <div id="lineup" class="tab-content">
+            <div class="section-header">
+                <h2>Starting 11</h2>
+                <div class="formation-selector">
+                    <label for="formation">Formation:</label>
+                    <select id="formation">
+                        <option value="4-4-2">4-4-2</option>
+                        <option value="4-3-3">4-3-3</option>
+                        <option value="3-5-2">3-5-2</option>
+                        <option value="4-2-3-1">4-2-3-1</option>
+                        <option value="4-5-1">4-5-1</option>
+                        <option value="3-4-3">3-4-3</option>
+                        <option value="5-3-2">5-3-2</option>
+                    </select>
+                </div>
+            </div>
+            <div class="average-rating">
+                <h3>Team Average Rating: <span id="team-avg">0.0</span></h3>
+            </div>
+            <div id="pitch" class="pitch">
+                <!-- Formation positions will be generated here -->
+            </div>
+        </div>
+
+        <!-- Add Player Tab -->
+        <div id="add-player" class="tab-content">
+            <div class="section-header">
+                <h2>Add New Player</h2>
+            </div>
+            <form id="player-form" class="player-form">
+                <div class="form-group">
+                    <label for="player-name">Name *</label>
+                    <input type="text" id="player-name" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="player-position">Position *</label>
+                    <select id="player-position" required>
+                        <option value="">Select Position</option>
+                        <option value="GK">Goalkeeper (GK)</option>
+                        <option value="DEF">Defender (DEF)</option>
+                        <option value="MID">Midfielder (MID)</option>
+                        <option value="FWD">Forward (FWD)</option>
+                    </select>
+                </div>
+
+                <h3>Technical Attributes</h3>
+                <div class="attributes-grid">
+                    <div class="form-group">
+                        <label for="attr-aerial">Aerial</label>
+                        <input type="number" id="attr-aerial" min="1" max="20" value="10">
+                    </div>
+                    <div class="form-group">
+                        <label for="attr-crossing">Crossing</label>
+                        <input type="number" id="attr-crossing" min="1" max="20" value="10">
+                    </div>
+                    <div class="form-group">
+                        <label for="attr-dribbling">Dribbling</label>
+                        <input type="number" id="attr-dribbling" min="1" max="20" value="10">
+                    </div>
+                    <div class="form-group">
+                        <label for="attr-passing">Passing</label>
+                        <input type="number" id="attr-passing" min="1" max="20" value="10">
+                    </div>
+                    <div class="form-group">
+                        <label for="attr-shooting">Shooting</label>
+                        <input type="number" id="attr-shooting" min="1" max="20" value="10">
+                    </div>
+                    <div class="form-group">
+                        <label for="attr-tackling">Tackling</label>
+                        <input type="number" id="attr-tackling" min="1" max="20" value="10">
+                    </div>
+                    <div class="form-group">
+                        <label for="attr-technique">Technique</label>
+                        <input type="number" id="attr-technique" min="1" max="20" value="10">
+                    </div>
+                </div>
+
+                <h3>Mental Attributes</h3>
+                <div class="attributes-grid">
+                    <div class="form-group">
+                        <label for="attr-creativity">Creativity</label>
+                        <input type="number" id="attr-creativity" min="1" max="20" value="10">
+                    </div>
+                    <div class="form-group">
+                        <label for="attr-decisions">Decisions</label>
+                        <input type="number" id="attr-decisions" min="1" max="20" value="10">
+                    </div>
+                    <div class="form-group">
+                        <label for="attr-movement">Movement</label>
+                        <input type="number" id="attr-movement" min="1" max="20" value="10">
+                    </div>
+                    <div class="form-group">
+                        <label for="attr-aggression">Aggression</label>
+                        <input type="number" id="attr-aggression" min="1" max="20" value="10">
+                    </div>
+                    <div class="form-group">
+                        <label for="attr-positioning">Positioning</label>
+                        <input type="number" id="attr-positioning" min="1" max="20" value="10">
+                    </div>
+                    <div class="form-group">
+                        <label for="attr-teamwork">Teamwork</label>
+                        <input type="number" id="attr-teamwork" min="1" max="20" value="10">
+                    </div>
+                    <div class="form-group">
+                        <label for="attr-leadership">Leadership</label>
+                        <input type="number" id="attr-leadership" min="1" max="20" value="10">
+                    </div>
+                </div>
+
+                <h3>Physical Attributes</h3>
+                <div class="attributes-grid">
+                    <div class="form-group">
+                        <label for="attr-pace">Pace</label>
+                        <input type="number" id="attr-pace" min="1" max="20" value="10">
+                    </div>
+                    <div class="form-group">
+                        <label for="attr-stamina">Stamina</label>
+                        <input type="number" id="attr-stamina" min="1" max="20" value="10">
+                    </div>
+                    <div class="form-group">
+                        <label for="attr-strength">Strength</label>
+                        <input type="number" id="attr-strength" min="1" max="20" value="10">
+                    </div>
+                </div>
+
+                <div id="gk-attributes" class="gk-section" style="display: none;">
+                    <h3>Goalkeeper Attributes</h3>
+                    <div class="attributes-grid">
+                        <div class="form-group">
+                            <label for="attr-agility">Agility</label>
+                            <input type="number" id="attr-agility" min="1" max="20" value="10">
+                        </div>
+                        <div class="form-group">
+                            <label for="attr-handling">Handling</label>
+                            <input type="number" id="attr-handling" min="1" max="20" value="10">
+                        </div>
+                        <div class="form-group">
+                            <label for="attr-kicking">Kicking</label>
+                            <input type="number" id="attr-kicking" min="1" max="20" value="10">
+                        </div>
+                        <div class="form-group">
+                            <label for="attr-reflexes">Reflexes</label>
+                            <input type="number" id="attr-reflexes" min="1" max="20" value="10">
+                        </div>
+                        <div class="form-group">
+                            <label for="attr-throwing">Throwing</label>
+                            <input type="number" id="attr-throwing" min="1" max="20" value="10">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary">Add Player</button>
+                    <button type="button" id="cancel-btn" class="btn btn-secondary">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
