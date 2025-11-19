@@ -5,6 +5,9 @@ let players = [];
 let lineup = [];
 let currentFormation = '4-4-2';
 let editingPlayerId = null;
+let draggedSlotIndex = null;
+let swapMode = false;
+let firstSwapSlotIndex = null;
 
 // Formation definitions - updated to use specific positions
 const formations = {
@@ -98,6 +101,97 @@ const formations = {
         { label: 'MC', position: 'MC', row: 2 },
         { label: 'ST', position: 'ST', row: 3 },
         { label: 'ST', position: 'ST', row: 3 }
+    ],
+    '4-1-4-1': [
+        { label: 'GK', position: 'GK', row: 0 },
+        { label: 'DL', position: 'DL', row: 1 },
+        { label: 'DC', position: 'DC', row: 1 },
+        { label: 'DC', position: 'DC', row: 1 },
+        { label: 'DR', position: 'DR', row: 1 },
+        { label: 'DMC', position: 'DMC', row: 2 },
+        { label: 'ML', position: 'ML', row: 3 },
+        { label: 'MC', position: 'MC', row: 3 },
+        { label: 'MC', position: 'MC', row: 3 },
+        { label: 'MR', position: 'MR', row: 3 },
+        { label: 'ST', position: 'ST', row: 4 }
+    ],
+    '4-4-1-1': [
+        { label: 'GK', position: 'GK', row: 0 },
+        { label: 'DL', position: 'DL', row: 1 },
+        { label: 'DC', position: 'DC', row: 1 },
+        { label: 'DC', position: 'DC', row: 1 },
+        { label: 'DR', position: 'DR', row: 1 },
+        { label: 'ML', position: 'ML', row: 2 },
+        { label: 'MC', position: 'MC', row: 2 },
+        { label: 'MC', position: 'MC', row: 2 },
+        { label: 'MR', position: 'MR', row: 2 },
+        { label: 'AMC', position: 'AMC', row: 3 },
+        { label: 'ST', position: 'ST', row: 4 }
+    ],
+    '3-4-1-2': [
+        { label: 'GK', position: 'GK', row: 0 },
+        { label: 'DC', position: 'DC', row: 1 },
+        { label: 'DC', position: 'DC', row: 1 },
+        { label: 'DC', position: 'DC', row: 1 },
+        { label: 'ML', position: 'ML', row: 2 },
+        { label: 'MC', position: 'MC', row: 2 },
+        { label: 'MC', position: 'MC', row: 2 },
+        { label: 'MR', position: 'MR', row: 2 },
+        { label: 'AMC', position: 'AMC', row: 3 },
+        { label: 'ST', position: 'ST', row: 4 },
+        { label: 'ST', position: 'ST', row: 4 }
+    ],
+    '4-1-2-1-2': [
+        { label: 'GK', position: 'GK', row: 0 },
+        { label: 'DL', position: 'DL', row: 1 },
+        { label: 'DC', position: 'DC', row: 1 },
+        { label: 'DC', position: 'DC', row: 1 },
+        { label: 'DR', position: 'DR', row: 1 },
+        { label: 'DMC', position: 'DMC', row: 2 },
+        { label: 'MC', position: 'MC', row: 3 },
+        { label: 'MC', position: 'MC', row: 3 },
+        { label: 'AMC', position: 'AMC', row: 4 },
+        { label: 'ST', position: 'ST', row: 5 },
+        { label: 'ST', position: 'ST', row: 5 }
+    ],
+    '5-4-1': [
+        { label: 'GK', position: 'GK', row: 0 },
+        { label: 'WBL', position: 'WBL', row: 1 },
+        { label: 'DC', position: 'DC', row: 1 },
+        { label: 'DC', position: 'DC', row: 1 },
+        { label: 'DC', position: 'DC', row: 1 },
+        { label: 'WBR', position: 'WBR', row: 1 },
+        { label: 'ML', position: 'ML', row: 2 },
+        { label: 'MC', position: 'MC', row: 2 },
+        { label: 'MC', position: 'MC', row: 2 },
+        { label: 'MR', position: 'MR', row: 2 },
+        { label: 'ST', position: 'ST', row: 3 }
+    ],
+    '4-3-2-1': [
+        { label: 'GK', position: 'GK', row: 0 },
+        { label: 'DL', position: 'DL', row: 1 },
+        { label: 'DC', position: 'DC', row: 1 },
+        { label: 'DC', position: 'DC', row: 1 },
+        { label: 'DR', position: 'DR', row: 1 },
+        { label: 'MC', position: 'MC', row: 2 },
+        { label: 'MC', position: 'MC', row: 2 },
+        { label: 'MC', position: 'MC', row: 2 },
+        { label: 'AML', position: 'AML', row: 3 },
+        { label: 'AMR', position: 'AMR', row: 3 },
+        { label: 'ST', position: 'ST', row: 4 }
+    ],
+    '4-1-3-2': [
+        { label: 'GK', position: 'GK', row: 0 },
+        { label: 'DL', position: 'DL', row: 1 },
+        { label: 'DC', position: 'DC', row: 1 },
+        { label: 'DC', position: 'DC', row: 1 },
+        { label: 'DR', position: 'DR', row: 1 },
+        { label: 'DMC', position: 'DMC', row: 2 },
+        { label: 'AML', position: 'AML', row: 3 },
+        { label: 'AMC', position: 'AMC', row: 3 },
+        { label: 'AMR', position: 'AMR', row: 3 },
+        { label: 'ST', position: 'ST', row: 4 },
+        { label: 'ST', position: 'ST', row: 4 }
     ]
 };
 
@@ -969,12 +1063,20 @@ function renderLineup() {
                 const roleDisplay = role ? `<div class="position-role">${role}</div>` : '';
                 const rating = calculateRating(player, role);
                 return `
-                    <div class="position-slot filled" onclick="changeRole(${slot.index}, '${slot.position}')">
+                    <div class="position-slot filled" 
+                         draggable="true" 
+                         data-slot-index="${slot.index}"
+                         ondragstart="handleDragStart(event, ${slot.index})"
+                         ondragover="handleDragOver(event)"
+                         ondrop="handleDrop(event, ${slot.index})"
+                         ondragend="handleDragEnd(event)"
+                         onclick="handleSlotClick(${slot.index}, '${slot.position}')">
                         <div class="position-label">${slot.label}</div>
                         <div class="position-player">${player.name}</div>
                         ${roleDisplay}
                         <div class="position-rating">${rating}</div>
                         <button class="position-remove" onclick="removeFromLineup(${slot.index}); event.stopPropagation();">Remove</button>
+                        <button class="position-swap" onclick="startSwapMode(${slot.index}); event.stopPropagation();">↔️ Swap</button>
                     </div>
                 `;
             } else {
@@ -994,6 +1096,83 @@ function renderLineup() {
 
     // Update team average
     updateTeamAverage();
+    
+    // Update swap mode UI if active
+    if (swapMode && firstSwapSlotIndex !== null) {
+        const firstSlot = document.querySelector(`[data-slot-index="${firstSwapSlotIndex}"]`);
+        if (firstSlot) {
+            firstSlot.classList.add('swap-selected');
+        }
+    }
+}
+
+// Drag and Drop handlers
+window.handleDragStart = function handleDragStart(event, slotIndex) {
+    draggedSlotIndex = slotIndex;
+    event.dataTransfer.effectAllowed = 'move';
+    event.target.classList.add('dragging');
+}
+
+window.handleDragOver = function handleDragOver(event) {
+    event.preventDefault();
+    event.dataTransfer.dropEffect = 'move';
+    return false;
+}
+
+window.handleDrop = function handleDrop(event, targetSlotIndex) {
+    event.stopPropagation();
+    event.preventDefault();
+    
+    if (draggedSlotIndex !== null && draggedSlotIndex !== targetSlotIndex) {
+        swapPlayers(draggedSlotIndex, targetSlotIndex);
+    }
+    
+    return false;
+}
+
+window.handleDragEnd = function handleDragEnd(event) {
+    event.target.classList.remove('dragging');
+    draggedSlotIndex = null;
+}
+
+// Swap mode handlers
+window.startSwapMode = function startSwapMode(slotIndex) {
+    if (!swapMode) {
+        swapMode = true;
+        firstSwapSlotIndex = slotIndex;
+        renderLineup();
+    } else {
+        if (firstSwapSlotIndex !== slotIndex) {
+            swapPlayers(firstSwapSlotIndex, slotIndex);
+        }
+        swapMode = false;
+        firstSwapSlotIndex = null;
+        renderLineup();
+    }
+}
+
+// Handle slot click - modified to support swap mode
+window.handleSlotClick = function handleSlotClick(slotIndex, position) {
+    if (swapMode) {
+        startSwapMode(slotIndex);
+    } else {
+        changeRole(slotIndex, position);
+    }
+}
+
+// Swap two players
+function swapPlayers(slotIndex1, slotIndex2) {
+    const assignment1 = lineup.find(l => l.slotIndex === slotIndex1);
+    const assignment2 = lineup.find(l => l.slotIndex === slotIndex2);
+    
+    if (!assignment1 || !assignment2) return;
+    
+    // Swap the slot indices
+    assignment1.slotIndex = slotIndex2;
+    assignment2.slotIndex = slotIndex1;
+    
+    saveData();
+    renderLineup();
 }
 
 // Select player for slot (show modal with available players)
