@@ -559,6 +559,17 @@ function handleAddPlayer(e) {
 // Calculate player rating
 function calculateRating(player, role = null) {
     const attrs = player.attributes;
+    const isGK = getPlayerPositions(player).includes('GK');
+    
+    // Define attributes based on position type
+    // For GK: Aerial, Technique, Creativity, Decisions, Aggression, Positioning, Teamwork, Pace, Stamina, Strength, Leadership + GK-specific
+    // For non-GK: Aerial, Crossing, Dribbling, Passing, Shooting, Tackling, Technique, Creativity, Decisions, Movement, Aggression, Positioning, Teamwork, Pace, Stamina, Strength, Leadership
+    const standardAttrs = isGK 
+        ? ['aerial', 'technique', 'creativity', 'decisions', 'aggression', 'positioning', 
+           'teamwork', 'pace', 'stamina', 'strength', 'leadership']
+        : ['aerial', 'crossing', 'dribbling', 'passing', 'shooting', 'tackling', 
+           'technique', 'creativity', 'decisions', 'movement', 'aggression', 'positioning', 
+           'teamwork', 'pace', 'stamina', 'strength', 'leadership'];
     
     // If a role is specified and has weighted attributes, use weighted calculation
     if (role && roleAttributeWeights[role]) {
@@ -569,12 +580,6 @@ function calculateRating(player, role = null) {
         let sum = 0;
         let totalWeight = 0;
         
-        // All attributes to consider
-        const standardAttrs = ['aerial', 'crossing', 'dribbling', 'passing', 'shooting', 
-                               'tackling', 'technique', 'creativity', 'decisions', 'movement',
-                               'aggression', 'positioning', 'teamwork', 'pace', 'stamina', 
-                               'strength', 'leadership'];
-        
         // Process standard attributes
         standardAttrs.forEach(attr => {
             const weight = weightedAttrs.includes(attr) ? weightedWeight : normalWeight;
@@ -583,7 +588,7 @@ function calculateRating(player, role = null) {
         });
         
         // Add GK attributes if goalkeeper
-        if (getPlayerPositions(player).includes('GK')) {
+        if (isGK) {
             const gkAttrs = ['agility', 'handling', 'kicking', 'reflexes', 'throwing'];
             gkAttrs.forEach(attr => {
                 if (attrs[attr]) {
@@ -600,12 +605,6 @@ function calculateRating(player, role = null) {
     // Default calculation without role (backward compatibility)
     let sum = 0;
     let count = 0;
-
-    // Count all standard attributes
-    const standardAttrs = ['aerial', 'crossing', 'dribbling', 'passing', 'shooting', 
-                           'tackling', 'technique', 'creativity', 'decisions', 'movement',
-                           'aggression', 'positioning', 'teamwork', 'pace', 'stamina', 
-                           'strength', 'leadership'];
     
     standardAttrs.forEach(attr => {
         sum += attrs[attr];
@@ -613,7 +612,7 @@ function calculateRating(player, role = null) {
     });
 
     // Add GK attributes if goalkeeper
-    if (getPlayerPositions(player).includes('GK')) {
+    if (isGK) {
         const gkAttrs = ['agility', 'handling', 'kicking', 'reflexes', 'throwing'];
         gkAttrs.forEach(attr => {
             if (attrs[attr]) {
