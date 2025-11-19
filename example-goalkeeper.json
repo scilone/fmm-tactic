@@ -1,6 +1,6 @@
 {
   "name": "Example Goalkeeper",
-  "position": "GK",
+  "positions": ["GK"],
   "attributes": {
     "aerial": 15,
     "crossing": 8,

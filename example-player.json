@@ -1,6 +1,6 @@
 {
   "name": "Example Player",
-  "position": "MID",
+  "positions": ["MC"],
   "attributes": {
     "aerial": 12,
     "crossing": 14,

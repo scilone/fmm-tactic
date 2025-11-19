@@ -463,15 +463,17 @@ header h1 {
     transform: scale(1.05);
 }
 
-.position-option input[type="radio"] {
+.position-option input[type="radio"],
+.position-option input[type="checkbox"] {
     display: none;
 }
-
-.position-option input[type="radio"]:checked + span {
+.position-option input[type="radio"]:checked + span,
+.position-option input[type="checkbox"]:checked + span {
     color: white;
 }
 
-.position-option:has(input[type="radio"]:checked) {
+.position-option:has(input[type="radio"]:checked),
+.position-option:has(input[type="checkbox"]:checked) {
     background: var(--accent-color);
     border-color: var(--accent-color);
     color: white;
