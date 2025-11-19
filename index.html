@@ -75,10 +75,11 @@
                 <h2>Add New Player</h2>
             </div>
             <div class="import-section">
-                <label for="import-json" class="btn btn-secondary" style="cursor: pointer;">
-                    📁 Import from JSON
-                </label>
-                <input type="file" id="import-json" accept=".json" style="display: none;">
+                <label for="import-json-textarea">📋 Paste JSON here:</label>
+                <textarea id="import-json-textarea" class="json-textarea" placeholder="Paste your player JSON data here..."></textarea>
+                <button type="button" id="import-json-btn" class="btn btn-secondary">
+                    Import from JSON
+                </button>
                 <div id="import-message" class="import-message"></div>
             </div>
             <form id="player-form" class="player-form">
