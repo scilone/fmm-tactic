@@ -13,6 +13,7 @@ A Progressive Web App (PWA) for managing your Football Manager Mobile squad and 
 - **Import players from JSON** files to quickly pre-fill the form
 - Search and filter players by position
 - View calculated player ratings
+- **View detailed position and role ratings** - See how a player performs in each position and role they can play
 - Delete players from your squad
 
 ### ⚡ Formation System
@@ -174,8 +175,23 @@ Example JSON files are provided in the repository:
 1. Use the "Squad" tab to view all players
 2. Filter by position using the dropdown
 3. Search for players by name
-4. Click "Add to Lineup" to quickly assign players
-5. Click "Delete" to remove players from your squad
+4. Click "📊 View Details" to see detailed position and role ratings for a player
+5. Click "Add to Lineup" to quickly assign players
+6. Click "Delete" to remove players from your squad
+
+#### Viewing Player Position and Role Ratings
+1. In the "Squad" tab, click the "📊 View Details" button on any player
+2. A modal will open showing:
+   - All positions the player can play
+   - Available roles for each position
+   - Calculated rating for each role based on player attributes
+3. Ratings are color-coded for easy assessment:
+   - **Green (16+)**: Excellent - Player is highly suited for this role
+   - **Light Green (14-15.9)**: Good - Player performs well in this role
+   - **Yellow (12-13.9)**: Average - Player is adequate in this role
+   - **Orange (10-11.9)**: Poor - Player may struggle in this role
+   - **Red (<10)**: Bad - Player is not suited for this role
+4. Use this information to determine the best position and role for each player
 
 #### Backing Up and Restoring Your Data
 
