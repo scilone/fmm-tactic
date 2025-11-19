@@ -4,6 +4,7 @@
 let players = [];
 let lineup = [];
 let currentFormation = '4-4-2';
+let editingPlayerId = null;
 
 // Formation definitions
 const formations = {
@@ -122,6 +123,8 @@ function setupEventListeners() {
     const cancelBtn = document.getElementById('cancel-btn');
     cancelBtn.addEventListener('click', () => {
         form.reset();
+        editingPlayerId = null;
+        updateFormTitle();
         switchTab('squad');
     });
 
@@ -162,12 +165,12 @@ function toggleGKAttributes() {
     gkSection.style.display = position === 'GK' ? 'block' : 'none';
 }
 
-// Add player
+// Add or Edit player
 function handleAddPlayer(e) {
     e.preventDefault();
 
     const player = {
-        id: Date.now(),
+        id: editingPlayerId || Date.now(),
         name: document.getElementById('player-name').value,
         position: document.getElementById('player-position').value,
         attributes: {
@@ -200,12 +203,25 @@ function handleAddPlayer(e) {
         player.attributes.throwing = parseInt(document.getElementById('attr-throwing').value);
     }
 
-    players.push(player);
+    if (editingPlayerId) {
+        // Update existing player
+        const index = players.findIndex(p => p.id === editingPlayerId);
+        if (index !== -1) {
+            players[index] = player;
+        }
+        editingPlayerId = null;
+    } else {
+        // Add new player
+        players.push(player);
+    }
+    
     saveData();
     
     e.target.reset();
+    updateFormTitle();
     switchTab('squad');
     renderSquad();
+    renderLineup();
 }
 
 // Calculate player rating
@@ -275,6 +291,9 @@ function renderSquad() {
                 <button class="btn btn-primary btn-small" onclick="addToLineup(${player.id})">
                     Add to Lineup
                 </button>
+                <button class="btn btn-secondary btn-small" onclick="editPlayer(${player.id})">
+                    Edit
+                </button>
                 <button class="btn btn-danger btn-small" onclick="deletePlayer(${player.id})">
                     Delete
                 </button>
@@ -283,8 +302,52 @@ function renderSquad() {
     `).join('');
 }
 
+// Edit player
+window.editPlayer = function editPlayer(id) {
+    const player = players.find(p => p.id === id);
+    if (!player) return;
+
+    editingPlayerId = id;
+
+    // Populate form with player data
+    document.getElementById('player-name').value = player.name;
+    document.getElementById('player-position').value = player.position;
+    
+    // Set all attributes
+    document.getElementById('attr-aerial').value = player.attributes.aerial;
+    document.getElementById('attr-crossing').value = player.attributes.crossing;
+    document.getElementById('attr-dribbling').value = player.attributes.dribbling;
+    document.getElementById('attr-passing').value = player.attributes.passing;
+    document.getElementById('attr-shooting').value = player.attributes.shooting;
+    document.getElementById('attr-tackling').value = player.attributes.tackling;
+    document.getElementById('attr-technique').value = player.attributes.technique;
+    document.getElementById('attr-creativity').value = player.attributes.creativity;
+    document.getElementById('attr-decisions').value = player.attributes.decisions;
+    document.getElementById('attr-movement').value = player.attributes.movement;
+    document.getElementById('attr-aggression').value = player.attributes.aggression;
+    document.getElementById('attr-positioning').value = player.attributes.positioning;
+    document.getElementById('attr-teamwork').value = player.attributes.teamwork;
+    document.getElementById('attr-pace').value = player.attributes.pace;
+    document.getElementById('attr-stamina').value = player.attributes.stamina;
+    document.getElementById('attr-strength').value = player.attributes.strength;
+    document.getElementById('attr-leadership').value = player.attributes.leadership;
+
+    // Set GK attributes if goalkeeper
+    if (player.position === 'GK') {
+        document.getElementById('attr-agility').value = player.attributes.agility || 10;
+        document.getElementById('attr-handling').value = player.attributes.handling || 10;
+        document.getElementById('attr-kicking').value = player.attributes.kicking || 10;
+        document.getElementById('attr-reflexes').value = player.attributes.reflexes || 10;
+        document.getElementById('attr-throwing').value = player.attributes.throwing || 10;
+    }
+
+    toggleGKAttributes();
+    updateFormTitle();
+    switchTab('add-player');
+}
+
 // Delete player
-function deletePlayer(id) {
+window.deletePlayer = function deletePlayer(id) {
     if (confirm('Are you sure you want to delete this player?')) {
         players = players.filter(p => p.id !== id);
         lineup = lineup.filter(slot => slot.playerId !== id);
@@ -294,8 +357,22 @@ function deletePlayer(id) {
     }
 }
 
+// Update form title based on mode
+function updateFormTitle() {
+    const formTitle = document.querySelector('#add-player .section-header h2');
+    const submitBtn = document.querySelector('#player-form button[type="submit"]');
+    
+    if (editingPlayerId) {
+        formTitle.textContent = 'Edit Player';
+        submitBtn.textContent = 'Update Player';
+    } else {
+        formTitle.textContent = 'Add New Player';
+        submitBtn.textContent = 'Add Player';
+    }
+}
+
 // Add to lineup (show modal)
-function addToLineup(playerId) {
+window.addToLineup = function addToLineup(playerId) {
     const player = players.find(p => p.id === playerId);
     if (!player) return;
 
@@ -370,13 +447,13 @@ function createModal() {
 }
 
 // Close modal
-function closeModal() {
+window.closeModal = function closeModal() {
     const modal = document.querySelector('.modal');
     if (modal) modal.remove();
 }
 
 // Assign player to slot
-function assignToSlot(playerId, slotIndex) {
+window.assignToSlot = function assignToSlot(playerId, slotIndex) {
     lineup.push({ slotIndex, playerId });
     saveData();
     renderLineup();
@@ -384,7 +461,7 @@ function assignToSlot(playerId, slotIndex) {
 }
 
 // Remove from lineup
-function removeFromLineup(slotIndex) {
+window.removeFromLineup = function removeFromLineup(slotIndex) {
     lineup = lineup.filter(slot => slot.slotIndex !== slotIndex);
     saveData();
     renderLineup();
@@ -437,7 +514,7 @@ function renderLineup() {
 }
 
 // Select player for slot (show modal with available players)
-function selectPlayerForSlot(slotIndex, position) {
+window.selectPlayerForSlot = function selectPlayerForSlot(slotIndex, position) {
     const availablePlayers = players.filter(p => {
         // Check if player matches position
         if (p.position !== position) return false;
