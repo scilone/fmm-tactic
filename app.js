@@ -6,98 +6,98 @@ let lineup = [];
 let currentFormation = '4-4-2';
 let editingPlayerId = null;
 
-// Formation definitions
+// Formation definitions - updated to use specific positions
 const formations = {
     '4-4-2': [
         { label: 'GK', position: 'GK', row: 0 },
-        { label: 'LB', position: 'DEF', row: 1 },
-        { label: 'CB', position: 'DEF', row: 1 },
-        { label: 'CB', position: 'DEF', row: 1 },
-        { label: 'RB', position: 'DEF', row: 1 },
-        { label: 'LM', position: 'MID', row: 2 },
-        { label: 'CM', position: 'MID', row: 2 },
-        { label: 'CM', position: 'MID', row: 2 },
-        { label: 'RM', position: 'MID', row: 2 },
-        { label: 'ST', position: 'FWD', row: 3 },
-        { label: 'ST', position: 'FWD', row: 3 }
+        { label: 'LB', position: 'DL', row: 1 },
+        { label: 'CB', position: 'DC', row: 1 },
+        { label: 'CB', position: 'DC', row: 1 },
+        { label: 'RB', position: 'DR', row: 1 },
+        { label: 'LM', position: 'ML', row: 2 },
+        { label: 'CM', position: 'MC', row: 2 },
+        { label: 'CM', position: 'MC', row: 2 },
+        { label: 'RM', position: 'MR', row: 2 },
+        { label: 'ST', position: 'ST', row: 3 },
+        { label: 'ST', position: 'ST', row: 3 }
     ],
     '4-3-3': [
         { label: 'GK', position: 'GK', row: 0 },
-        { label: 'LB', position: 'DEF', row: 1 },
-        { label: 'CB', position: 'DEF', row: 1 },
-        { label: 'CB', position: 'DEF', row: 1 },
-        { label: 'RB', position: 'DEF', row: 1 },
-        { label: 'CM', position: 'MID', row: 2 },
-        { label: 'CM', position: 'MID', row: 2 },
-        { label: 'CM', position: 'MID', row: 2 },
-        { label: 'LW', position: 'FWD', row: 3 },
-        { label: 'ST', position: 'FWD', row: 3 },
-        { label: 'RW', position: 'FWD', row: 3 }
+        { label: 'LB', position: 'DL', row: 1 },
+        { label: 'CB', position: 'DC', row: 1 },
+        { label: 'CB', position: 'DC', row: 1 },
+        { label: 'RB', position: 'DR', row: 1 },
+        { label: 'CM', position: 'MC', row: 2 },
+        { label: 'CM', position: 'MC', row: 2 },
+        { label: 'CM', position: 'MC', row: 2 },
+        { label: 'LW', position: 'AML', row: 3 },
+        { label: 'ST', position: 'ST', row: 3 },
+        { label: 'RW', position: 'AMR', row: 3 }
     ],
     '3-5-2': [
         { label: 'GK', position: 'GK', row: 0 },
-        { label: 'CB', position: 'DEF', row: 1 },
-        { label: 'CB', position: 'DEF', row: 1 },
-        { label: 'CB', position: 'DEF', row: 1 },
-        { label: 'LM', position: 'MID', row: 2 },
-        { label: 'CM', position: 'MID', row: 2 },
-        { label: 'CM', position: 'MID', row: 2 },
-        { label: 'CM', position: 'MID', row: 2 },
-        { label: 'RM', position: 'MID', row: 2 },
-        { label: 'ST', position: 'FWD', row: 3 },
-        { label: 'ST', position: 'FWD', row: 3 }
+        { label: 'CB', position: 'DC', row: 1 },
+        { label: 'CB', position: 'DC', row: 1 },
+        { label: 'CB', position: 'DC', row: 1 },
+        { label: 'LM', position: 'ML', row: 2 },
+        { label: 'CM', position: 'MC', row: 2 },
+        { label: 'CM', position: 'MC', row: 2 },
+        { label: 'CM', position: 'MC', row: 2 },
+        { label: 'RM', position: 'MR', row: 2 },
+        { label: 'ST', position: 'ST', row: 3 },
+        { label: 'ST', position: 'ST', row: 3 }
     ],
     '4-2-3-1': [
         { label: 'GK', position: 'GK', row: 0 },
-        { label: 'LB', position: 'DEF', row: 1 },
-        { label: 'CB', position: 'DEF', row: 1 },
-        { label: 'CB', position: 'DEF', row: 1 },
-        { label: 'RB', position: 'DEF', row: 1 },
-        { label: 'CDM', position: 'MID', row: 2 },
-        { label: 'CDM', position: 'MID', row: 2 },
-        { label: 'LM', position: 'MID', row: 3 },
-        { label: 'CAM', position: 'MID', row: 3 },
-        { label: 'RM', position: 'MID', row: 3 },
-        { label: 'ST', position: 'FWD', row: 4 }
+        { label: 'LB', position: 'DL', row: 1 },
+        { label: 'CB', position: 'DC', row: 1 },
+        { label: 'CB', position: 'DC', row: 1 },
+        { label: 'RB', position: 'DR', row: 1 },
+        { label: 'CDM', position: 'DMC', row: 2 },
+        { label: 'CDM', position: 'DMC', row: 2 },
+        { label: 'LM', position: 'AML', row: 3 },
+        { label: 'CAM', position: 'AMC', row: 3 },
+        { label: 'RM', position: 'AMR', row: 3 },
+        { label: 'ST', position: 'ST', row: 4 }
     ],
     '4-5-1': [
         { label: 'GK', position: 'GK', row: 0 },
-        { label: 'LB', position: 'DEF', row: 1 },
-        { label: 'CB', position: 'DEF', row: 1 },
-        { label: 'CB', position: 'DEF', row: 1 },
-        { label: 'RB', position: 'DEF', row: 1 },
-        { label: 'LM', position: 'MID', row: 2 },
-        { label: 'CM', position: 'MID', row: 2 },
-        { label: 'CM', position: 'MID', row: 2 },
-        { label: 'CM', position: 'MID', row: 2 },
-        { label: 'RM', position: 'MID', row: 2 },
-        { label: 'ST', position: 'FWD', row: 3 }
+        { label: 'LB', position: 'DL', row: 1 },
+        { label: 'CB', position: 'DC', row: 1 },
+        { label: 'CB', position: 'DC', row: 1 },
+        { label: 'RB', position: 'DR', row: 1 },
+        { label: 'LM', position: 'ML', row: 2 },
+        { label: 'CM', position: 'MC', row: 2 },
+        { label: 'CM', position: 'MC', row: 2 },
+        { label: 'CM', position: 'MC', row: 2 },
+        { label: 'RM', position: 'MR', row: 2 },
+        { label: 'ST', position: 'ST', row: 3 }
     ],
     '3-4-3': [
         { label: 'GK', position: 'GK', row: 0 },
-        { label: 'CB', position: 'DEF', row: 1 },
-        { label: 'CB', position: 'DEF', row: 1 },
-        { label: 'CB', position: 'DEF', row: 1 },
-        { label: 'LM', position: 'MID', row: 2 },
-        { label: 'CM', position: 'MID', row: 2 },
-        { label: 'CM', position: 'MID', row: 2 },
-        { label: 'RM', position: 'MID', row: 2 },
-        { label: 'LW', position: 'FWD', row: 3 },
-        { label: 'ST', position: 'FWD', row: 3 },
-        { label: 'RW', position: 'FWD', row: 3 }
+        { label: 'CB', position: 'DC', row: 1 },
+        { label: 'CB', position: 'DC', row: 1 },
+        { label: 'CB', position: 'DC', row: 1 },
+        { label: 'LM', position: 'ML', row: 2 },
+        { label: 'CM', position: 'MC', row: 2 },
+        { label: 'CM', position: 'MC', row: 2 },
+        { label: 'RM', position: 'MR', row: 2 },
+        { label: 'LW', position: 'AML', row: 3 },
+        { label: 'ST', position: 'ST', row: 3 },
+        { label: 'RW', position: 'AMR', row: 3 }
     ],
     '5-3-2': [
         { label: 'GK', position: 'GK', row: 0 },
-        { label: 'LWB', position: 'DEF', row: 1 },
-        { label: 'CB', position: 'DEF', row: 1 },
-        { label: 'CB', position: 'DEF', row: 1 },
-        { label: 'CB', position: 'DEF', row: 1 },
-        { label: 'RWB', position: 'DEF', row: 1 },
-        { label: 'CM', position: 'MID', row: 2 },
-        { label: 'CM', position: 'MID', row: 2 },
-        { label: 'CM', position: 'MID', row: 2 },
-        { label: 'ST', position: 'FWD', row: 3 },
-        { label: 'ST', position: 'FWD', row: 3 }
+        { label: 'LWB', position: 'WBL', row: 1 },
+        { label: 'CB', position: 'DC', row: 1 },
+        { label: 'CB', position: 'DC', row: 1 },
+        { label: 'CB', position: 'DC', row: 1 },
+        { label: 'RWB', position: 'WBR', row: 1 },
+        { label: 'CM', position: 'MC', row: 2 },
+        { label: 'CM', position: 'MC', row: 2 },
+        { label: 'CM', position: 'MC', row: 2 },
+        { label: 'ST', position: 'ST', row: 3 },
+        { label: 'ST', position: 'ST', row: 3 }
     ]
 };
 
@@ -129,8 +129,10 @@ function setupEventListeners() {
     });
 
     // Position selector for GK attributes
-    const positionSelect = document.getElementById('player-position');
-    positionSelect.addEventListener('change', toggleGKAttributes);
+    const positionRadios = document.querySelectorAll('input[name="position"]');
+    positionRadios.forEach(radio => {
+        radio.addEventListener('change', toggleGKAttributes);
+    });
 
     // Formation selector
     const formationSelect = document.getElementById('formation');
@@ -160,7 +162,8 @@ function switchTab(tabName) {
 
 // Toggle GK attributes visibility
 function toggleGKAttributes() {
-    const position = document.getElementById('player-position').value;
+    const selectedPosition = document.querySelector('input[name="position"]:checked');
+    const position = selectedPosition ? selectedPosition.value : '';
     const gkSection = document.getElementById('gk-attributes');
     gkSection.style.display = position === 'GK' ? 'block' : 'none';
 }
@@ -169,10 +172,16 @@ function toggleGKAttributes() {
 function handleAddPlayer(e) {
     e.preventDefault();
 
+    const selectedPosition = document.querySelector('input[name="position"]:checked');
+    if (!selectedPosition) {
+        alert('Please select a position');
+        return;
+    }
+
     const player = {
         id: editingPlayerId || Date.now(),
         name: document.getElementById('player-name').value,
-        position: document.getElementById('player-position').value,
+        position: selectedPosition.value,
         attributes: {
             aerial: parseInt(document.getElementById('attr-aerial').value),
             crossing: parseInt(document.getElementById('attr-crossing').value),
@@ -311,7 +320,12 @@ window.editPlayer = function editPlayer(id) {
 
     // Populate form with player data
     document.getElementById('player-name').value = player.name;
-    document.getElementById('player-position').value = player.position;
+    
+    // Set the radio button for position
+    const positionRadio = document.querySelector(`input[name="position"][value="${player.position}"]`);
+    if (positionRadio) {
+        positionRadio.checked = true;
+    }
     
     // Set all attributes
     document.getElementById('attr-aerial').value = player.attributes.aerial;

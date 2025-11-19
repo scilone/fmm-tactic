@@ -34,10 +34,20 @@
             <div class="filters">
                 <select id="position-filter">
                     <option value="all">All Positions</option>
-                    <option value="GK">Goalkeeper</option>
-                    <option value="DEF">Defender</option>
-                    <option value="MID">Midfielder</option>
-                    <option value="FWD">Forward</option>
+                    <option value="GK">GK - Goalkeeper</option>
+                    <option value="DL">DL - Defender Left</option>
+                    <option value="DC">DC - Defender Center</option>
+                    <option value="DR">DR - Defender Right</option>
+                    <option value="WBL">WBL - Wing Back Left</option>
+                    <option value="DMC">DMC - Defensive Midfielder Center</option>
+                    <option value="WBR">WBR - Wing Back Right</option>
+                    <option value="ML">ML - Midfielder Left</option>
+                    <option value="MC">MC - Midfielder Center</option>
+                    <option value="MR">MR - Midfielder Right</option>
+                    <option value="AML">AML - Attacking Midfielder Left</option>
+                    <option value="AMC">AMC - Attacking Midfielder Center</option>
+                    <option value="AMR">AMR - Attacking Midfielder Right</option>
+                    <option value="ST">ST - Striker</option>
                 </select>
                 <input type="text" id="search-player" placeholder="Search players...">
             </div>
@@ -81,14 +91,77 @@
                 </div>
 
                 <div class="form-group">
-                    <label for="player-position">Position *</label>
-                    <select id="player-position" required>
-                        <option value="">Select Position</option>
-                        <option value="GK">Goalkeeper (GK)</option>
-                        <option value="DEF">Defender (DEF)</option>
-                        <option value="MID">Midfielder (MID)</option>
-                        <option value="FWD">Forward (FWD)</option>
-                    </select>
+                    <label for="player-position">Position * (arranged like a football field)</label>
+                    <div class="position-grid">
+                        <div class="position-row position-row-1">
+                            <label class="position-option">
+                                <input type="radio" name="position" value="ST" required>
+                                <span>ST</span>
+                            </label>
+                        </div>
+                        <div class="position-row position-row-3">
+                            <label class="position-option">
+                                <input type="radio" name="position" value="AML" required>
+                                <span>AML</span>
+                            </label>
+                            <label class="position-option">
+                                <input type="radio" name="position" value="AMC" required>
+                                <span>AMC</span>
+                            </label>
+                            <label class="position-option">
+                                <input type="radio" name="position" value="AMR" required>
+                                <span>AMR</span>
+                            </label>
+                        </div>
+                        <div class="position-row position-row-3">
+                            <label class="position-option">
+                                <input type="radio" name="position" value="ML" required>
+                                <span>ML</span>
+                            </label>
+                            <label class="position-option">
+                                <input type="radio" name="position" value="MC" required>
+                                <span>MC</span>
+                            </label>
+                            <label class="position-option">
+                                <input type="radio" name="position" value="MR" required>
+                                <span>MR</span>
+                            </label>
+                        </div>
+                        <div class="position-row position-row-3">
+                            <label class="position-option">
+                                <input type="radio" name="position" value="WBL" required>
+                                <span>WBL</span>
+                            </label>
+                            <label class="position-option">
+                                <input type="radio" name="position" value="DMC" required>
+                                <span>DMC</span>
+                            </label>
+                            <label class="position-option">
+                                <input type="radio" name="position" value="WBR" required>
+                                <span>WBR</span>
+                            </label>
+                        </div>
+                        <div class="position-row position-row-3">
+                            <label class="position-option">
+                                <input type="radio" name="position" value="DL" required>
+                                <span>DL</span>
+                            </label>
+                            <label class="position-option">
+                                <input type="radio" name="position" value="DC" required>
+                                <span>DC</span>
+                            </label>
+                            <label class="position-option">
+                                <input type="radio" name="position" value="DR" required>
+                                <span>DR</span>
+                            </label>
+                        </div>
+                        <div class="position-row position-row-1">
+                            <label class="position-option">
+                                <input type="radio" name="position" value="GK" required>
+                                <span>GK</span>
+                            </label>
+                        </div>
+                    </div>
                 </div>
 
                 <h3>Technical Attributes</h3>
