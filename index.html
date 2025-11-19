@@ -31,6 +31,16 @@
                     <span id="squad-count">0 players</span>
                 </div>
             </div>
+            <div class="backup-section">
+                <button id="export-data-btn" class="btn btn-primary" title="Download all your data">
+                    💾 Export Data
+                </button>
+                <button id="import-data-btn" class="btn btn-secondary" title="Import data from a file">
+                    📂 Import Data
+                </button>
+                <input type="file" id="import-file-input" accept=".json" style="display: none;">
+                <div id="backup-message" class="backup-message"></div>
+            </div>
             <div class="filters">
                 <select id="position-filter">
                     <option value="all">All Positions</option>

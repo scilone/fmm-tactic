@@ -415,6 +415,45 @@ header h1 {
     border: 1px solid #f5c6cb;
 }
 
+/* Backup Section */
+.backup-section {
+    background: var(--card-bg);
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 2px 4px var(--shadow);
+    margin-bottom: 20px;
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.backup-message {
+    flex: 1 1 100%;
+    margin-top: 10px;
+    padding: 10px;
+    border-radius: 5px;
+    font-weight: 500;
+}
+
+.backup-message.success {
+    background: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+
+.backup-message.error {
+    background: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+
+.backup-message.info {
+    background: #d1ecf1;
+    color: #0c5460;
+    border: 1px solid #bee5eb;
+}
+
 /* Player Form */
 .player-form {
     background: var(--card-bg);

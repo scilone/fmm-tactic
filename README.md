@@ -32,8 +32,10 @@ Support for 7 popular formations:
 - Easy player assignment and removal
 - Formation switching with player retention
 
-### 💾 Data Persistence
+### 💾 Data Persistence & Backup
 - All data stored locally in browser
+- **Export/Import system** for backing up and restoring your data
+- Transfer your squad and tactics between different devices
 - Offline functionality via Service Worker
 - No account or internet required
 
@@ -158,19 +160,46 @@ Example JSON files are provided in the repository:
 4. Click "Add to Lineup" to quickly assign players
 5. Click "Delete" to remove players from your squad
 
+#### Backing Up and Restoring Your Data
+
+**Exporting Your Data:**
+1. Go to the "Squad" tab
+2. Click the "💾 Export Data" button
+3. A JSON file will be downloaded with your complete squad, lineup, and formation
+4. The file is named `fmm-backup-YYYY-MM-DD.json`
+
+**Importing Your Data:**
+1. Go to the "Squad" tab
+2. Click the "📂 Import Data" button
+3. Select your previously exported backup file
+4. Confirm the import (this will replace your current data)
+5. Your squad, lineup, and formation will be restored
+
+**Use Cases:**
+- Back up your data before clearing browser cache
+- Transfer your squad to another device
+- Share your team setup with friends
+- Keep multiple save files for different tactics
+
+**Example Files:**
+- `example-backup.json` - Example backup file format
+
 ## Technical Details
 
 ### File Structure
 ```
 fmm-tactic/
-├── index.html          # Main application structure
-├── styles.css          # Responsive styling
-├── app.js              # Application logic
-├── manifest.json       # PWA manifest
-├── service-worker.js   # Offline functionality
-├── icon-192.png        # PWA icon (192x192)
-├── icon-512.png        # PWA icon (512x512)
-└── README.md          # Documentation
+├── index.html             # Main application structure
+├── styles.css             # Responsive styling
+├── app.js                 # Application logic
+├── manifest.json          # PWA manifest
+├── service-worker.js      # Offline functionality
+├── icon-192.png           # PWA icon (192x192)
+├── icon-512.png           # PWA icon (512x512)
+├── example-player.json    # Example player data
+├── example-goalkeeper.json # Example goalkeeper data
+├── example-backup.json    # Example backup file format
+└── README.md             # Documentation
 ```
 
 ### Technologies Used
@@ -204,7 +233,10 @@ All data is stored locally using the browser's LocalStorage API:
 - `fmm-lineup`: Current starting 11 lineup assignments
 - `fmm-formation`: Selected formation
 
-**Note**: Clearing browser data will remove all saved information.
+**Important**: 
+- Clearing browser data will remove all saved information
+- Use the Export/Import feature to back up your data before clearing browser cache
+- Export files are in JSON format and can be edited manually if needed
 
 ## Screenshots
 
