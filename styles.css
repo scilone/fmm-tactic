@@ -332,6 +332,13 @@ header h1 {
     margin-bottom: 3px;
 }
 
+.position-role {
+    font-size: 0.75em;
+    color: var(--accent-color);
+    font-style: italic;
+    margin: 2px 0;
+}
+
 .position-rating {
     font-size: 0.9em;
     color: var(--secondary-color);
@@ -656,6 +663,17 @@ header h1 {
 .modal-player-item:hover {
     background: var(--background);
     border-color: var(--accent-color);
+}
+
+.modal-player-item.selected {
+    background: rgba(76, 175, 80, 0.1);
+    border-color: var(--accent-color);
+}
+
+.modal-player-item .checkmark {
+    float: right;
+    color: var(--accent-color);
+    font-weight: bold;
 }
 
 .modal-player-name {

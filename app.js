@@ -101,6 +101,99 @@ const formations = {
     ]
 };
 
+// Role definitions for each position
+const positionRoles = {
+    'GK': [
+        'Goalkeeper',
+        'Sweeper Keeper'
+    ],
+    'DC': [
+        'Central Defender',
+        'No-Nonsense Center-Back',
+        'Sweeper',
+        'Ball Playing Defender',
+        'Wide Center Back',
+        'Libero'
+    ],
+    'DL': [
+        'Full-Back',
+        'Inverted Full Back',
+        'Inverted Wing Back',
+        'Defensive Full Back',
+        'Wing-Back'
+    ],
+    'DR': [
+        'Full-Back',
+        'Inverted Full Back',
+        'Inverted Wing Back',
+        'Defensive Full Back',
+        'Wing-Back'
+    ],
+    'WBL': [
+        'Wing-Back',
+        'Inverted Wing Back'
+    ],
+    'WBR': [
+        'Wing-Back',
+        'Inverted Wing Back'
+    ],
+    'DMC': [
+        'Defensive Midfielder',
+        'Anchor',
+        'Roaming Playmaker',
+        'Deep Lying Playmaker',
+        'Ball Winning Midfielder'
+    ],
+    'MC': [
+        'Central Midfielder',
+        'Anchor',
+        'Box To Box Midfielder',
+        'Roaming Playmaker',
+        'Deep Lying Playmaker',
+        'Ball Winning Midfielder',
+        'Advanced Playmaker'
+    ],
+    'ML': [
+        'Wide Midfielder',
+        'Defensive Winger',
+        'Winger',
+        'Inverted Winger'
+    ],
+    'MR': [
+        'Wide Midfielder',
+        'Defensive Winger',
+        'Winger',
+        'Inverted Winger'
+    ],
+    'AML': [
+        'Winger',
+        'Advanced Playmaker',
+        'Inside Forward',
+        'Inverted Winger'
+    ],
+    'AMR': [
+        'Winger',
+        'Advanced Playmaker',
+        'Inside Forward',
+        'Inverted Winger'
+    ],
+    'AMC': [
+        'Attacking Midfielder',
+        'Trequartista',
+        'Advanced Playmaker',
+        'Shadow Striker'
+    ],
+    'ST': [
+        'Poacher',
+        'Deep Lying Forward',
+        'Complete Forward',
+        'Trequartista',
+        'Target Forward',
+        'Advanced Forward',
+        'Pressing Forward'
+    ]
+};
+
 // Initialize app
 document.addEventListener('DOMContentLoaded', () => {
     loadData();
@@ -633,12 +726,113 @@ window.closeModal = function closeModal() {
     if (modal) modal.remove();
 }
 
-// Assign player to slot
-window.assignToSlot = function assignToSlot(playerId, slotIndex) {
-    lineup.push({ slotIndex, playerId });
+// Show role selection modal
+function showRoleSelectionModal(playerId, slotIndex, position, roles) {
+    const player = players.find(p => p.id === playerId);
+    if (!player) return;
+    
+    const modal = createModal();
+    const content = modal.querySelector('.modal-content');
+    
+    content.innerHTML = `
+        <div class="modal-header">
+            <h3>Select Role for ${player.name}</h3>
+            <button class="modal-close" onclick="closeModal()">×</button>
+        </div>
+        <div class="modal-player-list">
+            ${roles.map(role => `
+                <div class="modal-player-item" onclick="assignWithRole(${playerId}, ${slotIndex}, '${role}')">
+                    <div class="modal-player-name">${role}</div>
+                </div>
+            `).join('')}
+        </div>
+    `;
+    
+    document.body.appendChild(modal);
+    modal.classList.add('active');
+}
+
+// Assign player with role
+window.assignWithRole = function assignWithRole(playerId, slotIndex, role) {
+    lineup.push({ slotIndex, playerId, role });
     saveData();
     renderLineup();
     closeModal();
+}
+
+// Change role for an already assigned player
+window.changeRole = function changeRole(slotIndex, position) {
+    const assignment = lineup.find(l => l.slotIndex === slotIndex);
+    if (!assignment) return;
+    
+    const roles = positionRoles[position] || [];
+    if (roles.length === 0) return;
+    
+    const player = players.find(p => p.id === assignment.playerId);
+    if (!player) return;
+    
+    const modal = createModal();
+    const content = modal.querySelector('.modal-content');
+    
+    content.innerHTML = `
+        <div class="modal-header">
+            <h3>Change Role for ${player.name}</h3>
+            <button class="modal-close" onclick="closeModal()">×</button>
+        </div>
+        <div class="modal-player-list">
+            ${roles.map(role => {
+                const isSelected = assignment.role === role;
+                const selectedClass = isSelected ? ' selected' : '';
+                return `
+                    <div class="modal-player-item${selectedClass}" onclick="updateRole(${slotIndex}, '${role}')">
+                        <div class="modal-player-name">${role}</div>
+                        ${isSelected ? '<span class="checkmark">✓</span>' : ''}
+                    </div>
+                `;
+            }).join('')}
+        </div>
+    `;
+    
+    document.body.appendChild(modal);
+    modal.classList.add('active');
+}
+
+// Update role for an assignment
+window.updateRole = function updateRole(slotIndex, role) {
+    const assignment = lineup.find(l => l.slotIndex === slotIndex);
+    if (assignment) {
+        assignment.role = role;
+        saveData();
+        renderLineup();
+        closeModal();
+    }
+}
+
+// Assign player to slot
+window.assignToSlot = function assignToSlot(playerId, slotIndex, skipRoleSelection = false) {
+    if (skipRoleSelection) {
+        lineup.push({ slotIndex, playerId });
+        saveData();
+        renderLineup();
+        closeModal();
+        return;
+    }
+    
+    // Show role selection modal
+    const formationDef = formations[currentFormation];
+    const slot = formationDef[slotIndex];
+    const roles = positionRoles[slot.position] || [];
+    
+    if (roles.length === 0) {
+        // No roles defined for this position, assign without role
+        lineup.push({ slotIndex, playerId });
+        saveData();
+        renderLineup();
+        closeModal();
+        return;
+    }
+    
+    showRoleSelectionModal(playerId, slotIndex, slot.position, roles);
 }
 
 // Remove from lineup
@@ -667,12 +861,15 @@ function renderLineup() {
             const player = assignment ? players.find(p => p.id === assignment.playerId) : null;
 
             if (player) {
+                const role = assignment.role || '';
+                const roleDisplay = role ? `<div class="position-role">${role}</div>` : '';
                 return `
-                    <div class="position-slot filled">
+                    <div class="position-slot filled" onclick="changeRole(${slot.index}, '${slot.position}')">
                         <div class="position-label">${slot.label}</div>
                         <div class="position-player">${player.name}</div>
+                        ${roleDisplay}
                         <div class="position-rating">${calculateRating(player)}</div>
-                        <button class="position-remove" onclick="removeFromLineup(${slot.index})">Remove</button>
+                        <button class="position-remove" onclick="removeFromLineup(${slot.index}); event.stopPropagation();">Remove</button>
                     </div>
                 `;
             } else {
