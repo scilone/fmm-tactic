@@ -345,6 +345,93 @@ const roleAttributeWeights = {
     'Pressing Forward': ['movement', 'decisions', 'strength', 'teamwork', 'tackling']
 };
 
+// Position-specific attribute penalties for irrelevant attributes
+// These attributes get negative or reduced weighting for certain positions
+const positionAttributePenalties = {
+    'GK': {
+        // Goalkeepers don't need attacking attributes
+        'shooting': -0.3,
+        'crossing': -0.3,
+        'dribbling': -0.2
+    },
+    'DC': {
+        // Central defenders rarely need attacking attributes
+        'shooting': -0.3,
+        'crossing': -0.2,
+        'dribbling': -0.1
+    },
+    'DL': {
+        // Full backs don't need shooting as much
+        'shooting': -0.2
+    },
+    'DR': {
+        // Full backs don't need shooting as much
+        'shooting': -0.2
+    },
+    'WBL': {
+        // Wing backs are more attacking, only slight penalty
+        'shooting': -0.1
+    },
+    'WBR': {
+        // Wing backs are more attacking, only slight penalty
+        'shooting': -0.1
+    },
+    'DMC': {
+        // Defensive midfielders don't need as much shooting/crossing
+        'shooting': -0.2,
+        'crossing': -0.2
+    },
+    'MC': {
+        // Central midfielders use most attributes
+        'crossing': -0.1
+    },
+    'ML': {},
+    'MR': {},
+    'AML': {
+        // Attacking players need less defensive attributes
+        'tackling': -0.1
+    },
+    'AMR': {
+        // Attacking players need less defensive attributes
+        'tackling': -0.1
+    },
+    'AMC': {
+        // Attacking midfielders need less defensive attributes
+        'tackling': -0.1,
+        'aerial': -0.1
+    },
+    'ST': {
+        // Strikers don't need defensive attributes
+        'tackling': -0.2,
+        'aerial': 0  // Aerial is useful for target men, so no penalty
+    }
+};
+
+// Calculate attribute frequency across all roles for a position
+// This helps identify which attributes are universally important for that position
+function calculateAttributeFrequency(position) {
+    const roles = positionRoles[position];
+    if (!roles) return {};
+    
+    const attributeCounts = {};
+    const totalRoles = roles.length;
+    
+    roles.forEach(role => {
+        const attrs = roleAttributeWeights[role] || [];
+        attrs.forEach(attr => {
+            attributeCounts[attr] = (attributeCounts[attr] || 0) + 1;
+        });
+    });
+    
+    // Convert counts to frequency (0-1)
+    const frequencies = {};
+    Object.keys(attributeCounts).forEach(attr => {
+        frequencies[attr] = attributeCounts[attr] / totalRoles;
+    });
+    
+    return frequencies;
+}
+
 // Initialize app
 document.addEventListener('DOMContentLoaded', () => {
     loadData();
@@ -654,7 +741,7 @@ function handleAddPlayer(e) {
 }
 
 // Calculate player rating
-function calculateRating(player, role = null) {
+function calculateRating(player, role = null, position = null) {
     const attrs = player.attributes;
     const isGK = getPlayerPositions(player).includes('GK');
     
@@ -670,16 +757,53 @@ function calculateRating(player, role = null) {
     
     // If a role is specified and has weighted attributes, use weighted calculation
     if (role && roleAttributeWeights[role]) {
-        const weightedAttrs = roleAttributeWeights[role];
-        const weightedWeight = 4.0; // Weighted attributes count more
+        const roleImportantAttrs = roleAttributeWeights[role];
+        
+        // Find the position for this role if not provided
+        let effectivePosition = position;
+        if (!effectivePosition) {
+            // Try to find position from positionRoles
+            for (const [pos, roles] of Object.entries(positionRoles)) {
+                if (roles.includes(role)) {
+                    effectivePosition = pos;
+                    break;
+                }
+            }
+        }
+        
+        // Get attribute frequency for this position
+        const attrFrequency = effectivePosition ? calculateAttributeFrequency(effectivePosition) : {};
+        const penalties = effectivePosition ? (positionAttributePenalties[effectivePosition] || {}) : {};
+        
+        // New balanced weighting system
+        const roleSpecificWeight = 2.5;  // Reduced from 4.0 to be less extreme
         const normalWeight = 1.0;
+        const frequencyBonus = 0.5;  // Bonus for attributes common across roles
         
         let sum = 0;
         let totalWeight = 0;
         
         // Process standard attributes
         standardAttrs.forEach(attr => {
-            const weight = weightedAttrs.includes(attr) ? weightedWeight : normalWeight;
+            let weight = normalWeight;
+            
+            // Check if this attribute is important for the specific role
+            if (roleImportantAttrs.includes(attr)) {
+                weight = roleSpecificWeight;
+            }
+            
+            // Add frequency bonus for attributes common across roles (>= 50% of roles)
+            if (attrFrequency[attr] && attrFrequency[attr] >= 0.5) {
+                weight += frequencyBonus;
+            }
+            
+            // Apply position-specific penalties for irrelevant attributes
+            if (penalties[attr] !== undefined) {
+                weight += penalties[attr];
+                // Ensure weight doesn't go below 0.1
+                weight = Math.max(0.1, weight);
+            }
+            
             sum += attrs[attr] * weight;
             totalWeight += weight;
         });
@@ -689,7 +813,16 @@ function calculateRating(player, role = null) {
             const gkAttrs = ['agility', 'handling', 'kicking', 'reflexes', 'throwing'];
             gkAttrs.forEach(attr => {
                 if (attrs[attr]) {
-                    const weight = weightedAttrs.includes(attr) ? weightedWeight : normalWeight;
+                    let weight = normalWeight;
+                    
+                    if (roleImportantAttrs.includes(attr)) {
+                        weight = roleSpecificWeight;
+                    }
+                    
+                    if (attrFrequency[attr] && attrFrequency[attr] >= 0.5) {
+                        weight += frequencyBonus;
+                    }
+                    
                     sum += attrs[attr] * weight;
                     totalWeight += weight;
                 }
@@ -951,11 +1084,18 @@ function showRoleSelectionModal(playerId, slotIndex, position, roles) {
             <button class="modal-close" onclick="closeModal()">×</button>
         </div>
         <div class="modal-player-list">
-            ${roles.map(role => `
-                <div class="modal-player-item" onclick="assignWithRole(${playerId}, ${slotIndex}, '${role}')">
-                    <div class="modal-player-name">${role}</div>
-                </div>
-            `).join('')}
+            ${roles.map(role => {
+                const rating = calculateRating(player, role, position);
+                const ratingClass = getRatingClass(parseFloat(rating));
+                return `
+                    <div class="modal-player-item" onclick="assignWithRole(${playerId}, ${slotIndex}, '${role}')">
+                        <div class="modal-player-name">${role}</div>
+                        <div class="modal-player-info">
+                            <span class="rating-badge ${ratingClass}">${rating}</span>
+                        </div>
+                    </div>
+                `;
+            }).join('')}
         </div>
     `;
     
@@ -994,10 +1134,15 @@ window.changeRole = function changeRole(slotIndex, position) {
             ${roles.map(role => {
                 const isSelected = assignment.role === role;
                 const selectedClass = isSelected ? ' selected' : '';
+                const rating = calculateRating(player, role, position);
+                const ratingClass = getRatingClass(parseFloat(rating));
                 return `
                     <div class="modal-player-item${selectedClass}" onclick="updateRole(${slotIndex}, '${role}')">
                         <div class="modal-player-name">${role}</div>
-                        ${isSelected ? '<span class="checkmark">✓</span>' : ''}
+                        <div class="modal-player-info">
+                            <span class="rating-badge ${ratingClass}">${rating}</span>
+                            ${isSelected ? '<span class="checkmark">✓</span>' : ''}
+                        </div>
                     </div>
                 `;
             }).join('')}
@@ -1074,7 +1219,7 @@ function renderLineup() {
             if (player) {
                 const role = assignment.role || '';
                 const roleDisplay = role ? `<div class="position-role">${role}</div>` : '';
-                const rating = calculateRating(player, role);
+                const rating = calculateRating(player, role, slot.position);
                 return `
                     <div class="position-slot filled" 
                          draggable="true" 
@@ -1312,21 +1457,23 @@ function updateTeamAverage() {
         return;
     }
 
-    const lineupPlayersWithRoles = lineup.map(slot => {
+    const formationDef = formations[currentFormation];
+    const lineupPlayersWithRolesAndPositions = lineup.map(slot => {
         const player = players.find(p => p.id === slot.playerId);
-        return player ? { player, role: slot.role } : null;
+        const slotDef = formationDef[slot.slotIndex];
+        return player ? { player, role: slot.role, position: slotDef.position } : null;
     }).filter(item => item !== null);
 
-    if (lineupPlayersWithRoles.length === 0) {
+    if (lineupPlayersWithRolesAndPositions.length === 0) {
         document.getElementById('team-avg').textContent = '0.0';
         return;
     }
 
-    const totalRating = lineupPlayersWithRoles.reduce((sum, item) => 
-        sum + parseFloat(calculateRating(item.player, item.role)), 0
+    const totalRating = lineupPlayersWithRolesAndPositions.reduce((sum, item) => 
+        sum + parseFloat(calculateRating(item.player, item.role, item.position)), 0
     );
     
-    const average = (totalRating / lineupPlayersWithRoles.length).toFixed(1);
+    const average = (totalRating / lineupPlayersWithRolesAndPositions.length).toFixed(1);
     document.getElementById('team-avg').textContent = average;
 }
 
@@ -1492,7 +1639,7 @@ window.viewPlayerDetails = function viewPlayerDetails(id) {
         `;
         
         roles.forEach(role => {
-            const rating = calculateRating(player, role);
+            const rating = calculateRating(player, role, position);
             const ratingClass = getRatingClass(parseFloat(rating));
             
             detailsHTML += `
