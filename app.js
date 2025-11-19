@@ -1081,7 +1081,12 @@ function renderLineup() {
                 `;
             } else {
                 return `
-                    <div class="position-slot" onclick="selectPlayerForSlot(${slot.index}, '${slot.position}')">
+                    <div class="position-slot" 
+                         data-slot-index="${slot.index}"
+                         data-position="${slot.position}"
+                         ondragover="handleDragOver(event)"
+                         ondrop="handleDropOnEmpty(event, ${slot.index}, '${slot.position}')"
+                         onclick="selectPlayerForSlot(${slot.index}, '${slot.position}')">
                         <div class="position-label">${slot.label}</div>
                         <div style="color: white; margin-top: 10px;">+</div>
                     </div>
@@ -1130,6 +1135,18 @@ window.handleDrop = function handleDrop(event, targetSlotIndex) {
     return false;
 }
 
+// Handle drop on empty slot
+window.handleDropOnEmpty = function handleDropOnEmpty(event, targetSlotIndex, targetPosition) {
+    event.stopPropagation();
+    event.preventDefault();
+    
+    if (draggedSlotIndex !== null && draggedSlotIndex !== targetSlotIndex) {
+        movePlayerToEmptySlot(draggedSlotIndex, targetSlotIndex, targetPosition);
+    }
+    
+    return false;
+}
+
 window.handleDragEnd = function handleDragEnd(event) {
     event.target.classList.remove('dragging');
     draggedSlotIndex = null;
@@ -1170,6 +1187,29 @@ function swapPlayers(slotIndex1, slotIndex2) {
     // Swap the slot indices
     assignment1.slotIndex = slotIndex2;
     assignment2.slotIndex = slotIndex1;
+    
+    saveData();
+    renderLineup();
+}
+
+// Move player to empty slot
+function movePlayerToEmptySlot(fromSlotIndex, toSlotIndex, toPosition) {
+    const assignment = lineup.find(l => l.slotIndex === fromSlotIndex);
+    
+    if (!assignment) return;
+    
+    const player = players.find(p => p.id === assignment.playerId);
+    if (!player) return;
+    
+    // Check if player can play in the target position
+    const playerPositions = getPlayerPositions(player);
+    if (!playerPositions.includes(toPosition)) {
+        alert(`${player.name} cannot play in position ${toPosition}. Player positions: ${playerPositions.join(', ')}`);
+        return;
+    }
+    
+    // Move the player to the new slot
+    assignment.slotIndex = toSlotIndex;
     
     saveData();
     renderLineup();
