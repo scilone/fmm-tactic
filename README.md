@@ -181,19 +181,25 @@ Example JSON files are provided in the repository:
 - Share your team setup with friends
 - Keep multiple save files for different tactics
 
+**Example Files:**
+- `example-backup.json` - Example backup file format
+
 ## Technical Details
 
 ### File Structure
 ```
 fmm-tactic/
-├── index.html          # Main application structure
-├── styles.css          # Responsive styling
-├── app.js              # Application logic
-├── manifest.json       # PWA manifest
-├── service-worker.js   # Offline functionality
-├── icon-192.png        # PWA icon (192x192)
-├── icon-512.png        # PWA icon (512x512)
-└── README.md          # Documentation
+├── index.html             # Main application structure
+├── styles.css             # Responsive styling
+├── app.js                 # Application logic
+├── manifest.json          # PWA manifest
+├── service-worker.js      # Offline functionality
+├── icon-192.png           # PWA icon (192x192)
+├── icon-512.png           # PWA icon (512x512)
+├── example-player.json    # Example player data
+├── example-goalkeeper.json # Example goalkeeper data
+├── example-backup.json    # Example backup file format
+└── README.md             # Documentation
 ```
 
 ### Technologies Used

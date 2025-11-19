@@ -1,0 +1,65 @@
+{
+  "version": "1.0",
+  "exportDate": "2025-01-01T12:00:00.000Z",
+  "data": {
+    "players": [
+      {
+        "id": 1234567890123,
+        "name": "Example Striker",
+        "positions": ["ST"],
+        "position": "ST",
+        "attributes": {
+          "aerial": 16,
+          "crossing": 12,
+          "dribbling": 18,
+          "passing": 15,
+          "shooting": 19,
+          "tackling": 10,
+          "technique": 17,
+          "creativity": 16,
+          "decisions": 17,
+          "movement": 18,
+          "aggression": 14,
+          "positioning": 18,
+          "teamwork": 16,
+          "pace": 19,
+          "stamina": 17,
+          "strength": 15,
+          "leadership": 14
+        }
+      },
+      {
+        "id": 1234567890124,
+        "name": "Example Goalkeeper",
+        "positions": ["GK"],
+        "position": "GK",
+        "attributes": {
+          "aerial": 15,
+          "crossing": 10,
+          "dribbling": 11,
+          "passing": 13,
+          "shooting": 9,
+          "tackling": 12,
+          "technique": 14,
+          "creativity": 12,
+          "decisions": 17,
+          "movement": 13,
+          "aggression": 14,
+          "positioning": 19,
+          "teamwork": 16,
+          "pace": 13,
+          "stamina": 15,
+          "strength": 15,
+          "leadership": 17,
+          "agility": 19,
+          "handling": 20,
+          "kicking": 15,
+          "reflexes": 20,
+          "throwing": 16
+        }
+      }
+    ],
+    "lineup": [],
+    "formation": "4-4-2"
+  }
+}
