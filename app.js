@@ -760,6 +760,9 @@ function renderSquad() {
             </div>
             <div class="player-rating">Rating: ${calculateRating(player)}</div>
             <div class="player-actions">
+                <button class="btn btn-primary btn-small" onclick="viewPlayerDetails(${player.id})">
+                    📊 View Details
+                </button>
                 <button class="btn btn-primary btn-small" onclick="addToLineup(${player.id})">
                     Add to Lineup
                 </button>
@@ -1458,6 +1461,98 @@ function showBackupMessage(message, type) {
         messageDiv.textContent = '';
         messageDiv.className = 'backup-message';
     }, 5000);
+}
+
+// Player Details Modal
+window.viewPlayerDetails = function viewPlayerDetails(id) {
+    const player = players.find(p => p.id === id);
+    if (!player) return;
+
+    const modal = document.getElementById('player-details-modal');
+    const modalPlayerName = document.getElementById('modal-player-name');
+    const modalDetails = document.getElementById('modal-player-details');
+
+    modalPlayerName.textContent = `${player.name} - Position Ratings`;
+
+    const playerPositions = getPlayerPositions(player);
+    
+    // Build the HTML for each position
+    let detailsHTML = '';
+    
+    playerPositions.forEach(position => {
+        const roles = positionRoles[position] || [];
+        
+        detailsHTML += `
+            <div class="position-section">
+                <div class="position-header">${position} - ${getPositionFullName(position)}</div>
+                <div class="roles-grid">
+        `;
+        
+        roles.forEach(role => {
+            const rating = calculateRating(player, role);
+            const ratingClass = getRatingClass(parseFloat(rating));
+            
+            detailsHTML += `
+                <div class="role-card">
+                    <div class="role-name">${role}</div>
+                    <div class="role-rating">
+                        <span class="rating-badge ${ratingClass}">${rating}</span>
+                    </div>
+                </div>
+            `;
+        });
+        
+        detailsHTML += `
+                </div>
+            </div>
+        `;
+    });
+
+    modalDetails.innerHTML = detailsHTML;
+    modal.classList.add('active');
+};
+
+window.closePlayerDetailsModal = function closePlayerDetailsModal() {
+    const modal = document.getElementById('player-details-modal');
+    modal.classList.remove('active');
+};
+
+// Close modal when clicking outside
+document.addEventListener('click', (e) => {
+    const modal = document.getElementById('player-details-modal');
+    if (e.target === modal) {
+        closePlayerDetailsModal();
+    }
+});
+
+// Helper function to get position full name
+function getPositionFullName(position) {
+    const positionNames = {
+        'GK': 'Goalkeeper',
+        'DL': 'Defender Left',
+        'DC': 'Defender Center',
+        'DR': 'Defender Right',
+        'WBL': 'Wing Back Left',
+        'WBR': 'Wing Back Right',
+        'DMC': 'Defensive Midfielder Center',
+        'ML': 'Midfielder Left',
+        'MC': 'Midfielder Center',
+        'MR': 'Midfielder Right',
+        'AML': 'Attacking Midfielder Left',
+        'AMC': 'Attacking Midfielder Center',
+        'AMR': 'Attacking Midfielder Right',
+        'ST': 'Striker'
+    };
+    return positionNames[position] || position;
+}
+
+// Helper function to get rating class based on value
+function getRatingClass(rating) {
+    if (rating >= 16) return 'rating-excellent';
+    if (rating >= 14) return 'rating-good';
+    if (rating >= 12) return 'rating-average';
+    if (rating >= 10) return 'rating-poor';
+    return 'rating-bad';
 }
 
 // Service Worker Registration is handled automatically by Vite PWA plugin
