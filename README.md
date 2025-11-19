@@ -10,6 +10,7 @@ A Progressive Web App (PWA) for managing your Football Manager Mobile squad and 
   - **Mental**: Creativity, Decisions, Movement, Aggression, Positioning, Teamwork, Leadership
   - **Physical**: Pace, Stamina, Strength
   - **Goalkeeper**: Agility, Handling, Kicking, Reflexes, Throwing
+- **Import players from JSON** files to quickly pre-fill the form
 - Search and filter players by position
 - View calculated player ratings
 - Delete players from your squad
@@ -81,11 +82,67 @@ npm run preview
 ### Usage
 
 #### Adding a Player
+
+**Manual Entry:**
 1. Click the "Add Player" tab
 2. Enter player name and select position (GK, DEF, MID, FWD)
 3. Set attribute values (1-20) for all categories
 4. For goalkeepers, additional GK-specific attributes will appear
 5. Click "Add Player" to save
+
+**Import from JSON:**
+1. Click the "Add Player" tab
+2. Click "📁 Import from JSON" button
+3. Select a JSON file with player attributes (see example below)
+4. The form will be automatically pre-filled with the imported data
+5. Review the data and click "Add Player" to save
+
+JSON Format Example:
+```json
+{
+  "name": "Player Name",
+  "position": "MID",
+  "attributes": {
+    "aerial": 12,
+    "crossing": 14,
+    "dribbling": 16,
+    "passing": 17,
+    "shooting": 15,
+    "tackling": 13,
+    "technique": 16,
+    "creativity": 17,
+    "decisions": 15,
+    "movement": 16,
+    "aggression": 12,
+    "positioning": 15,
+    "teamwork": 16,
+    "leadership": 14,
+    "pace": 15,
+    "stamina": 16,
+    "strength": 13
+  }
+}
+```
+
+For goalkeepers, add these additional attributes:
+```json
+{
+  "name": "Goalkeeper Name",
+  "position": "GK",
+  "attributes": {
+    // ... all standard attributes ...
+    "agility": 17,
+    "handling": 18,
+    "kicking": 15,
+    "reflexes": 18,
+    "throwing": 16
+  }
+}
+```
+
+Example JSON files are provided in the repository:
+- `example-player.json` - Example field player
+- `example-goalkeeper.json` - Example goalkeeper
 
 #### Building Your Starting 11
 1. Go to the "Starting 11" tab

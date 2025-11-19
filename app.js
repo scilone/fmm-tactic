@@ -148,6 +148,10 @@ function setupEventListeners() {
 
     const positionFilter = document.getElementById('position-filter');
     positionFilter.addEventListener('change', renderSquad);
+
+    // JSON import
+    const importBtn = document.getElementById('import-json-btn');
+    importBtn.addEventListener('click', handleImportJSON);
 }
 
 // Tab switching
@@ -168,6 +172,144 @@ function toggleGKAttributes() {
     gkSection.style.display = position === 'GK' ? 'block' : 'none';
 }
 
+// Handle JSON import
+function handleImportJSON() {
+    const textarea = document.getElementById('import-json-textarea');
+    const jsonText = textarea.value.trim();
+    
+    if (!jsonText) {
+        showImportMessage('Please paste JSON data in the textarea', 'error');
+        return;
+    }
+
+    try {
+        const data = JSON.parse(jsonText);
+        
+        // Pre-fill name if present
+        const nameValue = data.name || data.Name;
+        if (nameValue !== undefined) {
+            document.getElementById('player-name').value = nameValue;
+        }
+        
+        // Pre-fill position if present and valid
+        const positionValue = data.position || data.Position;
+        if (positionValue !== undefined) {
+            const validPositions = ['GK', 'DEF', 'MID', 'FWD'];
+            if (validPositions.includes(positionValue)) {
+                document.getElementById('player-position').value = positionValue;
+                // Toggle GK attributes visibility if needed
+                toggleGKAttributes();
+            }
+        }
+
+        // Pre-fill attributes if they exist (either in data.attributes or directly in data)
+        const attrs = data.attributes || data;
+        
+        // Helper function to get attribute value with case-insensitive matching
+        const getAttr = (keys) => {
+            for (const key of keys) {
+                if (attrs[key] !== undefined) return attrs[key];
+            }
+            return undefined;
+        };
+        
+        // Technical attributes
+        const aerial = getAttr(['aerial', 'Aerial']);
+        if (aerial !== undefined) document.getElementById('attr-aerial').value = aerial;
+        
+        const crossing = getAttr(['crossing', 'Crossing']);
+        if (crossing !== undefined) document.getElementById('attr-crossing').value = crossing;
+        
+        const dribbling = getAttr(['dribbling', 'Dribbling']);
+        if (dribbling !== undefined) document.getElementById('attr-dribbling').value = dribbling;
+        
+        const passing = getAttr(['passing', 'Passing']);
+        if (passing !== undefined) document.getElementById('attr-passing').value = passing;
+        
+        const shooting = getAttr(['shooting', 'Shooting']);
+        if (shooting !== undefined) document.getElementById('attr-shooting').value = shooting;
+        
+        const tackling = getAttr(['tackling', 'Tackling']);
+        if (tackling !== undefined) document.getElementById('attr-tackling').value = tackling;
+        
+        const technique = getAttr(['technique', 'Technique']);
+        if (technique !== undefined) document.getElementById('attr-technique').value = technique;
+        
+        // Mental attributes
+        const creativity = getAttr(['creativity', 'Creativity']);
+        if (creativity !== undefined) document.getElementById('attr-creativity').value = creativity;
+        
+        const decisions = getAttr(['decisions', 'Decisions']);
+        if (decisions !== undefined) document.getElementById('attr-decisions').value = decisions;
+        
+        const movement = getAttr(['movement', 'Movement']);
+        if (movement !== undefined) document.getElementById('attr-movement').value = movement;
+        
+        const aggression = getAttr(['aggression', 'Aggression']);
+        if (aggression !== undefined) document.getElementById('attr-aggression').value = aggression;
+        
+        const positioning = getAttr(['positioning', 'Positioning']);
+        if (positioning !== undefined) document.getElementById('attr-positioning').value = positioning;
+        
+        const teamwork = getAttr(['teamwork', 'Teamwork']);
+        if (teamwork !== undefined) document.getElementById('attr-teamwork').value = teamwork;
+        
+        const leadership = getAttr(['leadership', 'Leadership']);
+        if (leadership !== undefined) document.getElementById('attr-leadership').value = leadership;
+        
+        // Physical attributes
+        const pace = getAttr(['pace', 'Pace']);
+        if (pace !== undefined) document.getElementById('attr-pace').value = pace;
+        
+        const stamina = getAttr(['stamina', 'Stamina']);
+        if (stamina !== undefined) document.getElementById('attr-stamina').value = stamina;
+        
+        const strength = getAttr(['strength', 'Strength']);
+        if (strength !== undefined) document.getElementById('attr-strength').value = strength;
+        
+        // GK-specific attributes (only if position is GK)
+        const currentPosition = document.getElementById('player-position').value;
+        if (currentPosition === 'GK') {
+            const agility = getAttr(['agility', 'Agility', 'Agility (GK)']);
+            if (agility !== undefined) document.getElementById('attr-agility').value = agility;
+            
+            const handling = getAttr(['handling', 'Handling', 'Handling (GK)']);
+            if (handling !== undefined) document.getElementById('attr-handling').value = handling;
+            
+            const kicking = getAttr(['kicking', 'Kicking', 'Kicking (GK)']);
+            if (kicking !== undefined) document.getElementById('attr-kicking').value = kicking;
+            
+            const reflexes = getAttr(['reflexes', 'Reflexes', 'Reflexes (GK)']);
+            if (reflexes !== undefined) document.getElementById('attr-reflexes').value = reflexes;
+            
+            const throwing = getAttr(['throwing', 'Throwing', 'Throwing (GK)']);
+            if (throwing !== undefined) document.getElementById('attr-throwing').value = throwing;
+        }
+
+        showImportMessage('✓ Player data imported successfully! Review and click "Add Player" to save.', 'success');
+        
+        // Clear the textarea
+        textarea.value = '';
+        
+    } catch (error) {
+        showImportMessage('Error: Invalid JSON format. Please check your data.', 'error');
+    }
+}
+
+// Show import message
+function showImportMessage(message, type) {
+    const messageDiv = document.getElementById('import-message');
+    messageDiv.textContent = message;
+    messageDiv.className = `import-message ${type}`;
+    
+    // Auto-hide message after 5 seconds
+    setTimeout(() => {
+        messageDiv.textContent = '';
+        messageDiv.className = 'import-message';
+    }, 5000);
+}
+
+// Add player
 // Add or Edit player
 function handleAddPlayer(e) {
     e.preventDefault();
