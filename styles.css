@@ -727,3 +727,53 @@ header h1 {
     color: var(--text-secondary);
     font-size: 0.9em;
 }
+
+/* Drag and Drop Styles */
+.position-slot.filled {
+    cursor: move;
+}
+
+.position-slot.dragging {
+    opacity: 0.5;
+    transform: scale(0.95);
+}
+
+.position-slot.filled[draggable="true"]:hover {
+    box-shadow: 0 0 10px rgba(76, 175, 80, 0.5);
+}
+
+/* Swap Mode Styles */
+.position-slot.swap-selected {
+    border-color: #ff9800 !important;
+    box-shadow: 0 0 15px rgba(255, 152, 0, 0.7);
+    animation: pulse 1s infinite;
+}
+
+@keyframes pulse {
+    0%, 100% {
+        box-shadow: 0 0 15px rgba(255, 152, 0, 0.7);
+    }
+    50% {
+        box-shadow: 0 0 25px rgba(255, 152, 0, 0.9);
+    }
+}
+
+.position-swap {
+    background: #ff9800;
+    color: white;
+    border: none;
+    padding: 3px 8px;
+    border-radius: 3px;
+    font-size: 0.75em;
+    cursor: pointer;
+    margin-top: 5px;
+    margin-left: 5px;
+}
+
+.position-swap:hover {
+    background: #f57c00;
+}
+
+.position-remove:hover {
+    background: #c82333;
+}

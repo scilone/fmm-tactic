@@ -5,6 +5,9 @@ let players = [];
 let lineup = [];
 let currentFormation = '4-4-2';
 let editingPlayerId = null;
+let draggedSlotIndex = null;
+let swapMode = false;
+let firstSwapSlotIndex = null;
 
 // Formation definitions - updated to use specific positions
 const formations = {
@@ -98,6 +101,97 @@ const formations = {
         { label: 'MC', position: 'MC', row: 2 },
         { label: 'ST', position: 'ST', row: 3 },
         { label: 'ST', position: 'ST', row: 3 }
+    ],
+    '4-1-4-1': [
+        { label: 'GK', position: 'GK', row: 0 },
+        { label: 'DL', position: 'DL', row: 1 },
+        { label: 'DC', position: 'DC', row: 1 },
+        { label: 'DC', position: 'DC', row: 1 },
+        { label: 'DR', position: 'DR', row: 1 },
+        { label: 'DMC', position: 'DMC', row: 2 },
+        { label: 'ML', position: 'ML', row: 3 },
+        { label: 'MC', position: 'MC', row: 3 },
+        { label: 'MC', position: 'MC', row: 3 },
+        { label: 'MR', position: 'MR', row: 3 },
+        { label: 'ST', position: 'ST', row: 4 }
+    ],
+    '4-4-1-1': [
+        { label: 'GK', position: 'GK', row: 0 },
+        { label: 'DL', position: 'DL', row: 1 },
+        { label: 'DC', position: 'DC', row: 1 },
+        { label: 'DC', position: 'DC', row: 1 },
+        { label: 'DR', position: 'DR', row: 1 },
+        { label: 'ML', position: 'ML', row: 2 },
+        { label: 'MC', position: 'MC', row: 2 },
+        { label: 'MC', position: 'MC', row: 2 },
+        { label: 'MR', position: 'MR', row: 2 },
+        { label: 'AMC', position: 'AMC', row: 3 },
+        { label: 'ST', position: 'ST', row: 4 }
+    ],
+    '3-4-1-2': [
+        { label: 'GK', position: 'GK', row: 0 },
+        { label: 'DC', position: 'DC', row: 1 },
+        { label: 'DC', position: 'DC', row: 1 },
+        { label: 'DC', position: 'DC', row: 1 },
+        { label: 'ML', position: 'ML', row: 2 },
+        { label: 'MC', position: 'MC', row: 2 },
+        { label: 'MC', position: 'MC', row: 2 },
+        { label: 'MR', position: 'MR', row: 2 },
+        { label: 'AMC', position: 'AMC', row: 3 },
+        { label: 'ST', position: 'ST', row: 4 },
+        { label: 'ST', position: 'ST', row: 4 }
+    ],
+    '4-1-2-1-2': [
+        { label: 'GK', position: 'GK', row: 0 },
+        { label: 'DL', position: 'DL', row: 1 },
+        { label: 'DC', position: 'DC', row: 1 },
+        { label: 'DC', position: 'DC', row: 1 },
+        { label: 'DR', position: 'DR', row: 1 },
+        { label: 'DMC', position: 'DMC', row: 2 },
+        { label: 'MC', position: 'MC', row: 3 },
+        { label: 'MC', position: 'MC', row: 3 },
+        { label: 'AMC', position: 'AMC', row: 4 },
+        { label: 'ST', position: 'ST', row: 5 },
+        { label: 'ST', position: 'ST', row: 5 }
+    ],
+    '5-4-1': [
+        { label: 'GK', position: 'GK', row: 0 },
+        { label: 'WBL', position: 'WBL', row: 1 },
+        { label: 'DC', position: 'DC', row: 1 },
+        { label: 'DC', position: 'DC', row: 1 },
+        { label: 'DC', position: 'DC', row: 1 },
+        { label: 'WBR', position: 'WBR', row: 1 },
+        { label: 'ML', position: 'ML', row: 2 },
+        { label: 'MC', position: 'MC', row: 2 },
+        { label: 'MC', position: 'MC', row: 2 },
+        { label: 'MR', position: 'MR', row: 2 },
+        { label: 'ST', position: 'ST', row: 3 }
+    ],
+    '4-3-2-1': [
+        { label: 'GK', position: 'GK', row: 0 },
+        { label: 'DL', position: 'DL', row: 1 },
+        { label: 'DC', position: 'DC', row: 1 },
+        { label: 'DC', position: 'DC', row: 1 },
+        { label: 'DR', position: 'DR', row: 1 },
+        { label: 'MC', position: 'MC', row: 2 },
+        { label: 'MC', position: 'MC', row: 2 },
+        { label: 'MC', position: 'MC', row: 2 },
+        { label: 'AML', position: 'AML', row: 3 },
+        { label: 'AMR', position: 'AMR', row: 3 },
+        { label: 'ST', position: 'ST', row: 4 }
+    ],
+    '4-1-3-2': [
+        { label: 'GK', position: 'GK', row: 0 },
+        { label: 'DL', position: 'DL', row: 1 },
+        { label: 'DC', position: 'DC', row: 1 },
+        { label: 'DC', position: 'DC', row: 1 },
+        { label: 'DR', position: 'DR', row: 1 },
+        { label: 'DMC', position: 'DMC', row: 2 },
+        { label: 'AML', position: 'AML', row: 3 },
+        { label: 'AMC', position: 'AMC', row: 3 },
+        { label: 'AMR', position: 'AMR', row: 3 },
+        { label: 'ST', position: 'ST', row: 4 },
+        { label: 'ST', position: 'ST', row: 4 }
     ]
 };
 
@@ -969,17 +1063,30 @@ function renderLineup() {
                 const roleDisplay = role ? `<div class="position-role">${role}</div>` : '';
                 const rating = calculateRating(player, role);
                 return `
-                    <div class="position-slot filled" onclick="changeRole(${slot.index}, '${slot.position}')">
+                    <div class="position-slot filled" 
+                         draggable="true" 
+                         data-slot-index="${slot.index}"
+                         ondragstart="handleDragStart(event, ${slot.index})"
+                         ondragover="handleDragOver(event)"
+                         ondrop="handleDrop(event, ${slot.index})"
+                         ondragend="handleDragEnd(event)"
+                         onclick="handleSlotClick(${slot.index}, '${slot.position}')">
                         <div class="position-label">${slot.label}</div>
                         <div class="position-player">${player.name}</div>
                         ${roleDisplay}
                         <div class="position-rating">${rating}</div>
                         <button class="position-remove" onclick="removeFromLineup(${slot.index}); event.stopPropagation();">Remove</button>
+                        <button class="position-swap" onclick="startSwapMode(${slot.index}); event.stopPropagation();">↔️ Swap</button>
                     </div>
                 `;
             } else {
                 return `
-                    <div class="position-slot" onclick="selectPlayerForSlot(${slot.index}, '${slot.position}')">
+                    <div class="position-slot" 
+                         data-slot-index="${slot.index}"
+                         data-position="${slot.position}"
+                         ondragover="handleDragOver(event)"
+                         ondrop="handleDropOnEmpty(event, ${slot.index}, '${slot.position}')"
+                         onclick="selectPlayerForSlot(${slot.index}, '${slot.position}')">
                         <div class="position-label">${slot.label}</div>
                         <div style="color: white; margin-top: 10px;">+</div>
                     </div>
@@ -994,6 +1101,148 @@ function renderLineup() {
 
     // Update team average
     updateTeamAverage();
+    
+    // Update swap mode UI if active
+    if (swapMode && firstSwapSlotIndex !== null) {
+        const firstSlot = document.querySelector(`[data-slot-index="${firstSwapSlotIndex}"]`);
+        if (firstSlot) {
+            firstSlot.classList.add('swap-selected');
+        }
+    }
+}
+
+// Drag and Drop handlers
+window.handleDragStart = function handleDragStart(event, slotIndex) {
+    draggedSlotIndex = slotIndex;
+    event.dataTransfer.effectAllowed = 'move';
+    event.target.classList.add('dragging');
+}
+
+window.handleDragOver = function handleDragOver(event) {
+    event.preventDefault();
+    event.dataTransfer.dropEffect = 'move';
+    return false;
+}
+
+window.handleDrop = function handleDrop(event, targetSlotIndex) {
+    event.stopPropagation();
+    event.preventDefault();
+    
+    if (draggedSlotIndex !== null && draggedSlotIndex !== targetSlotIndex) {
+        swapPlayers(draggedSlotIndex, targetSlotIndex);
+    }
+    
+    return false;
+}
+
+// Handle drop on empty slot
+window.handleDropOnEmpty = function handleDropOnEmpty(event, targetSlotIndex, targetPosition) {
+    event.stopPropagation();
+    event.preventDefault();
+    
+    if (draggedSlotIndex !== null && draggedSlotIndex !== targetSlotIndex) {
+        movePlayerToEmptySlot(draggedSlotIndex, targetSlotIndex, targetPosition);
+    }
+    
+    return false;
+}
+
+window.handleDragEnd = function handleDragEnd(event) {
+    event.target.classList.remove('dragging');
+    draggedSlotIndex = null;
+}
+
+// Swap mode handlers
+window.startSwapMode = function startSwapMode(slotIndex) {
+    if (!swapMode) {
+        swapMode = true;
+        firstSwapSlotIndex = slotIndex;
+        renderLineup();
+    } else {
+        if (firstSwapSlotIndex !== slotIndex) {
+            swapPlayers(firstSwapSlotIndex, slotIndex);
+        }
+        swapMode = false;
+        firstSwapSlotIndex = null;
+        renderLineup();
+    }
+}
+
+// Handle slot click - modified to support swap mode
+window.handleSlotClick = function handleSlotClick(slotIndex, position) {
+    if (swapMode) {
+        startSwapMode(slotIndex);
+    } else {
+        changeRole(slotIndex, position);
+    }
+}
+
+// Swap two players
+function swapPlayers(slotIndex1, slotIndex2) {
+    const assignment1 = lineup.find(l => l.slotIndex === slotIndex1);
+    const assignment2 = lineup.find(l => l.slotIndex === slotIndex2);
+    
+    if (!assignment1 || !assignment2) return;
+    
+    // Get the positions for these slots
+    const formationDef = formations[currentFormation];
+    const slot1Position = formationDef[slotIndex1].position;
+    const slot2Position = formationDef[slotIndex2].position;
+    
+    // Get the players
+    const player1 = players.find(p => p.id === assignment1.playerId);
+    const player2 = players.find(p => p.id === assignment2.playerId);
+    
+    if (!player1 || !player2) return;
+    
+    // Check if both players can play in each other's positions
+    const player1Positions = getPlayerPositions(player1);
+    const player2Positions = getPlayerPositions(player2);
+    
+    const player1CanPlaySlot2 = player1Positions.includes(slot2Position);
+    const player2CanPlaySlot1 = player2Positions.includes(slot1Position);
+    
+    if (!player1CanPlaySlot2 || !player2CanPlaySlot1) {
+        let message = 'Cannot swap players:\n';
+        if (!player1CanPlaySlot2) {
+            message += `- ${player1.name} cannot play ${slot2Position} (positions: ${player1Positions.join(', ')})\n`;
+        }
+        if (!player2CanPlaySlot1) {
+            message += `- ${player2.name} cannot play ${slot1Position} (positions: ${player2Positions.join(', ')})`;
+        }
+        alert(message);
+        return;
+    }
+    
+    // Swap the slot indices
+    assignment1.slotIndex = slotIndex2;
+    assignment2.slotIndex = slotIndex1;
+    
+    saveData();
+    renderLineup();
+}
+
+// Move player to empty slot
+function movePlayerToEmptySlot(fromSlotIndex, toSlotIndex, toPosition) {
+    const assignment = lineup.find(l => l.slotIndex === fromSlotIndex);
+    
+    if (!assignment) return;
+    
+    const player = players.find(p => p.id === assignment.playerId);
+    if (!player) return;
+    
+    // Check if player can play in the target position
+    const playerPositions = getPlayerPositions(player);
+    if (!playerPositions.includes(toPosition)) {
+        alert(`${player.name} cannot play in position ${toPosition}. Player positions: ${playerPositions.join(', ')}`);
+        return;
+    }
+    
+    // Move the player to the new slot
+    assignment.slotIndex = toSlotIndex;
+    
+    saveData();
+    renderLineup();
 }
 
 // Select player for slot (show modal with available players)
