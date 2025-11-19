@@ -1,0 +1,28 @@
+{
+  "name": "Example Goalkeeper",
+  "position": "GK",
+  "attributes": {
+    "aerial": 15,
+    "crossing": 8,
+    "dribbling": 10,
+    "passing": 12,
+    "shooting": 6,
+    "tackling": 9,
+    "technique": 13,
+    "creativity": 10,
+    "decisions": 16,
+    "movement": 14,
+    "aggression": 11,
+    "positioning": 17,
+    "teamwork": 15,
+    "leadership": 16,
+    "pace": 12,
+    "stamina": 14,
+    "strength": 14,
+    "agility": 17,
+    "handling": 18,
+    "kicking": 15,
+    "reflexes": 18,
+    "throwing": 16
+  }
+}

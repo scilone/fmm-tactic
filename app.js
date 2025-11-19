@@ -143,6 +143,10 @@ function setupEventListeners() {
 
     const positionFilter = document.getElementById('position-filter');
     positionFilter.addEventListener('change', renderSquad);
+
+    // JSON import
+    const importInput = document.getElementById('import-json');
+    importInput.addEventListener('change', handleImportJSON);
 }
 
 // Tab switching
@@ -160,6 +164,110 @@ function toggleGKAttributes() {
     const position = document.getElementById('player-position').value;
     const gkSection = document.getElementById('gk-attributes');
     gkSection.style.display = position === 'GK' ? 'block' : 'none';
+}
+
+// Handle JSON import
+function handleImportJSON(e) {
+    const file = e.target.files[0];
+    const messageDiv = document.getElementById('import-message');
+    
+    if (!file) {
+        return;
+    }
+
+    const reader = new FileReader();
+    
+    reader.onload = (event) => {
+        try {
+            const data = JSON.parse(event.target.result);
+            
+            // Validate required fields
+            if (!data.name || !data.position) {
+                showImportMessage('JSON must contain "name" and "position" fields', 'error');
+                return;
+            }
+
+            // Validate position
+            const validPositions = ['GK', 'DEF', 'MID', 'FWD'];
+            if (!validPositions.includes(data.position)) {
+                showImportMessage('Position must be one of: GK, DEF, MID, FWD', 'error');
+                return;
+            }
+
+            // Pre-fill the form
+            document.getElementById('player-name').value = data.name;
+            document.getElementById('player-position').value = data.position;
+            
+            // Toggle GK attributes visibility if needed
+            toggleGKAttributes();
+
+            // Pre-fill attributes if they exist
+            if (data.attributes) {
+                const attrs = data.attributes;
+                
+                // Technical attributes
+                if (attrs.aerial !== undefined) document.getElementById('attr-aerial').value = attrs.aerial;
+                if (attrs.crossing !== undefined) document.getElementById('attr-crossing').value = attrs.crossing;
+                if (attrs.dribbling !== undefined) document.getElementById('attr-dribbling').value = attrs.dribbling;
+                if (attrs.passing !== undefined) document.getElementById('attr-passing').value = attrs.passing;
+                if (attrs.shooting !== undefined) document.getElementById('attr-shooting').value = attrs.shooting;
+                if (attrs.tackling !== undefined) document.getElementById('attr-tackling').value = attrs.tackling;
+                if (attrs.technique !== undefined) document.getElementById('attr-technique').value = attrs.technique;
+                
+                // Mental attributes
+                if (attrs.creativity !== undefined) document.getElementById('attr-creativity').value = attrs.creativity;
+                if (attrs.decisions !== undefined) document.getElementById('attr-decisions').value = attrs.decisions;
+                if (attrs.movement !== undefined) document.getElementById('attr-movement').value = attrs.movement;
+                if (attrs.aggression !== undefined) document.getElementById('attr-aggression').value = attrs.aggression;
+                if (attrs.positioning !== undefined) document.getElementById('attr-positioning').value = attrs.positioning;
+                if (attrs.teamwork !== undefined) document.getElementById('attr-teamwork').value = attrs.teamwork;
+                if (attrs.leadership !== undefined) document.getElementById('attr-leadership').value = attrs.leadership;
+                
+                // Physical attributes
+                if (attrs.pace !== undefined) document.getElementById('attr-pace').value = attrs.pace;
+                if (attrs.stamina !== undefined) document.getElementById('attr-stamina').value = attrs.stamina;
+                if (attrs.strength !== undefined) document.getElementById('attr-strength').value = attrs.strength;
+                
+                // GK-specific attributes (only if goalkeeper)
+                if (data.position === 'GK') {
+                    if (attrs.agility !== undefined) document.getElementById('attr-agility').value = attrs.agility;
+                    if (attrs.handling !== undefined) document.getElementById('attr-handling').value = attrs.handling;
+                    if (attrs.kicking !== undefined) document.getElementById('attr-kicking').value = attrs.kicking;
+                    if (attrs.reflexes !== undefined) document.getElementById('attr-reflexes').value = attrs.reflexes;
+                    if (attrs.throwing !== undefined) document.getElementById('attr-throwing').value = attrs.throwing;
+                }
+            }
+
+            showImportMessage('✓ Player data imported successfully! Review and click "Add Player" to save.', 'success');
+            
+            // Clear the file input
+            e.target.value = '';
+            
+        } catch (error) {
+            showImportMessage('Error: Invalid JSON format. Please check your file.', 'error');
+            e.target.value = '';
+        }
+    };
+    
+    reader.onerror = () => {
+        showImportMessage('Error: Could not read file.', 'error');
+        e.target.value = '';
+    };
+    
+    reader.readAsText(file);
+}
+
+// Show import message
+function showImportMessage(message, type) {
+    const messageDiv = document.getElementById('import-message');
+    messageDiv.textContent = message;
+    messageDiv.className = `import-message ${type}`;
+    
+    // Auto-hide message after 5 seconds
+    setTimeout(() => {
+        messageDiv.textContent = '';
+        messageDiv.className = 'import-message';
+    }, 5000);
 }
 
 // Add player
