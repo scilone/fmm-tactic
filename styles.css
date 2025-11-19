@@ -551,6 +551,31 @@ header h1 {
     border-color: var(--accent-color);
 }
 
+/* Attribute value color coding */
+input[type="number"].attr-value-1-4 {
+    background-color: #ffcccc;
+    color: #990000;
+    font-weight: 600;
+}
+
+input[type="number"].attr-value-5-9 {
+    background-color: #ffd9a3;
+    color: #cc6600;
+    font-weight: 600;
+}
+
+input[type="number"].attr-value-10-14 {
+    background-color: #cce5ff;
+    color: #0066cc;
+    font-weight: 600;
+}
+
+input[type="number"].attr-value-15-20 {
+    background-color: #ccffcc;
+    color: #006600;
+    font-weight: 600;
+}
+
 .attributes-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
@@ -908,27 +933,23 @@ header h1 {
     font-size: 0.9em;
 }
 
+/* Rating badge colors - matching attribute input colors */
 .rating-excellent {
-    background-color: #4caf50;
-    color: white;
+    background-color: #ccffcc;
+    color: #006600;
 }
 
 .rating-good {
-    background-color: #8bc34a;
-    color: white;
+    background-color: #cce5ff;
+    color: #0066cc;
 }
 
 .rating-average {
-    background-color: #ffc107;
-    color: #333;
+    background-color: #ffd9a3;
+    color: #cc6600;
 }
 
 .rating-poor {
-    background-color: #ff9800;
-    color: white;
-}
-
-.rating-bad {
-    background-color: #f44336;
-    color: white;
+    background-color: #ffcccc;
+    color: #990000;
 }

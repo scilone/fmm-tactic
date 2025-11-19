@@ -408,6 +408,9 @@ function setupEventListeners() {
 
     const importFileInput = document.getElementById('import-file-input');
     importFileInput.addEventListener('change', handleImportData);
+
+    // Attribute value color coding
+    setupAttributeColorCoding();
 }
 
 // Tab switching
@@ -1547,12 +1550,45 @@ function getPositionFullName(position) {
 }
 
 // Helper function to get rating class based on value
+// Using the same color scheme as attribute inputs:
+// 15-20: green, 10-14: blue, 5-9: orange, 1-4: red
 function getRatingClass(rating) {
-    if (rating >= 16) return 'rating-excellent';
-    if (rating >= 14) return 'rating-good';
-    if (rating >= 12) return 'rating-average';
-    if (rating >= 10) return 'rating-poor';
-    return 'rating-bad';
+    if (rating >= 15) return 'rating-excellent';  // Green (15-20)
+    if (rating >= 10) return 'rating-good';       // Blue (10-14)
+    if (rating >= 5) return 'rating-average';     // Orange (5-9)
+    return 'rating-poor';                          // Red (1-4)
+}
+
+// Setup attribute color coding
+function setupAttributeColorCoding() {
+    // Get all attribute input fields (type="number" with id starting with "attr-")
+    const attributeInputs = document.querySelectorAll('input[type="number"][id^="attr-"]');
+    
+    attributeInputs.forEach(input => {
+        // Update color on input change
+        input.addEventListener('input', updateAttributeColor);
+        // Update color initially
+        updateAttributeColor.call(input);
+    });
+}
+
+// Update attribute input color based on value
+function updateAttributeColor() {
+    const value = parseInt(this.value);
+    
+    // Remove all color classes
+    this.classList.remove('attr-value-1-4', 'attr-value-5-9', 'attr-value-10-14', 'attr-value-15-20');
+    
+    // Add appropriate color class based on value
+    if (value >= 1 && value <= 4) {
+        this.classList.add('attr-value-1-4');
+    } else if (value >= 5 && value <= 9) {
+        this.classList.add('attr-value-5-9');
+    } else if (value >= 10 && value <= 14) {
+        this.classList.add('attr-value-10-14');
+    } else if (value >= 15 && value <= 20) {
+        this.classList.add('attr-value-15-20');
+    }
 }
 
 // Service Worker Registration is handled automatically by Vite PWA plugin
