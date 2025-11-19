@@ -732,6 +732,13 @@ function renderSquad() {
         return matchesSearch && matchesPosition;
     });
 
+    // Sort by rating (highest first)
+    filteredPlayers.sort((a, b) => {
+        const ratingA = parseFloat(calculateRating(a));
+        const ratingB = parseFloat(calculateRating(b));
+        return ratingB - ratingA;
+    });
+
     document.getElementById('squad-count').textContent = 
         `${filteredPlayers.length} player${filteredPlayers.length !== 1 ? 's' : ''}`;
 
@@ -1259,6 +1266,13 @@ window.selectPlayerForSlot = function selectPlayerForSlot(slotIndex, position) {
         alert(`No available ${position} players. Add more players to your squad.`);
         return;
     }
+
+    // Sort by rating (highest first)
+    availablePlayers.sort((a, b) => {
+        const ratingA = parseFloat(calculateRating(a));
+        const ratingB = parseFloat(calculateRating(b));
+        return ratingB - ratingA;
+    });
 
     const modal = createModal();
     const content = modal.querySelector('.modal-content');
