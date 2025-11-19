@@ -163,7 +163,10 @@ Example JSON files are provided in the repository:
 5. The team average rating updates automatically
 
 **Rearranging Players:**
-- **Drag-and-Drop**: Click and hold a player card, then drag it to another position to swap players
+- **Drag-and-Drop (Swap)**: Click and hold a player card, then drag it to another filled position to swap players
+- **Drag-and-Drop (Move)**: Click and hold a player card, then drag it to an empty position slot (marked with "+") to move the player there
+  - Example: In a 4-4-2 formation, drag an MC player to an empty ST slot to effectively convert to a 4-3-3
+  - The system validates that the player can play in the target position before allowing the move
 - **Swap Button**: Click the "↔️ Swap" button on one player, then click the "↔️ Swap" button on another player to swap their positions
 - The selected player will be highlighted with an orange border while in swap mode
 
