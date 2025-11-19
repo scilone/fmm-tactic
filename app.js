@@ -245,6 +245,18 @@ function setupEventListeners() {
     // JSON import
     const importBtn = document.getElementById('import-json-btn');
     importBtn.addEventListener('click', handleImportJSON);
+
+    // Data export/import
+    const exportBtn = document.getElementById('export-data-btn');
+    exportBtn.addEventListener('click', handleExportData);
+
+    const importDataBtn = document.getElementById('import-data-btn');
+    importDataBtn.addEventListener('click', () => {
+        document.getElementById('import-file-input').click();
+    });
+
+    const importFileInput = document.getElementById('import-file-input');
+    importFileInput.addEventListener('change', handleImportData);
 }
 
 // Tab switching
@@ -977,6 +989,118 @@ function loadData() {
         currentFormation = savedFormation;
         document.getElementById('formation').value = currentFormation;
     }
+}
+
+// Export/Import Data functions
+function handleExportData() {
+    try {
+        const exportData = {
+            version: '1.0',
+            exportDate: new Date().toISOString(),
+            data: {
+                players: players,
+                lineup: lineup,
+                formation: currentFormation
+            }
+        };
+
+        const dataStr = JSON.stringify(exportData, null, 2);
+        const dataBlob = new Blob([dataStr], { type: 'application/json' });
+        
+        const url = URL.createObjectURL(dataBlob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `fmm-backup-${new Date().toISOString().split('T')[0]}.json`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+
+        showBackupMessage('✓ Data exported successfully!', 'success');
+    } catch (error) {
+        showBackupMessage('Error exporting data. Please try again.', 'error');
+        console.error('Export error:', error);
+    }
+}
+
+function handleImportData(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+        try {
+            const importedData = JSON.parse(e.target.result);
+            
+            // Validate data structure
+            if (!importedData.data || typeof importedData.data !== 'object') {
+                throw new Error('Invalid backup file format');
+            }
+
+            const { players: importedPlayers, lineup: importedLineup, formation: importedFormation } = importedData.data;
+
+            // Confirm before replacing data
+            const hasExistingData = players.length > 0 || lineup.length > 0;
+            if (hasExistingData) {
+                const confirmed = confirm(
+                    'This will replace all your current data. Are you sure you want to continue?\n\n' +
+                    `Current data: ${players.length} players\n` +
+                    `Import data: ${importedPlayers?.length || 0} players`
+                );
+                if (!confirmed) {
+                    event.target.value = ''; // Reset file input
+                    return;
+                }
+            }
+
+            // Import data
+            if (Array.isArray(importedPlayers)) {
+                players = importedPlayers;
+            }
+            if (Array.isArray(importedLineup)) {
+                lineup = importedLineup;
+            }
+            if (importedFormation) {
+                currentFormation = importedFormation;
+                document.getElementById('formation').value = currentFormation;
+            }
+
+            // Save and refresh UI
+            saveData();
+            renderSquad();
+            renderLineup();
+
+            showBackupMessage(
+                `✓ Data imported successfully! ${players.length} player${players.length !== 1 ? 's' : ''} loaded.`,
+                'success'
+            );
+        } catch (error) {
+            showBackupMessage('Error: Invalid backup file. Please check the file format.', 'error');
+            console.error('Import error:', error);
+        }
+        
+        // Reset file input
+        event.target.value = '';
+    };
+
+    reader.onerror = () => {
+        showBackupMessage('Error reading file. Please try again.', 'error');
+        event.target.value = '';
+    };
+
+    reader.readAsText(file);
+}
+
+function showBackupMessage(message, type) {
+    const messageDiv = document.getElementById('backup-message');
+    messageDiv.textContent = message;
+    messageDiv.className = `backup-message ${type}`;
+    
+    // Auto-hide message after 5 seconds
+    setTimeout(() => {
+        messageDiv.textContent = '';
+        messageDiv.className = 'backup-message';
+    }, 5000);
 }
 
 // Service Worker Registration is handled automatically by Vite PWA plugin
