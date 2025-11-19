@@ -270,9 +270,6 @@ header h1 {
 /* Pitch */
 .pitch {
     background: var(--pitch-green);
-    background-image: 
-        linear-gradient(90deg, transparent 49%, var(--pitch-line) 49%, var(--pitch-line) 51%, transparent 51%),
-        linear-gradient(0deg, transparent 49%, var(--pitch-line) 49%, var(--pitch-line) 51%, transparent 51%);
     background-size: 100% 100%;
     border: 3px solid white;
     border-radius: 10px;
