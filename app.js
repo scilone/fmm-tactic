@@ -574,7 +574,7 @@ function calculateRating(player, role = null) {
     // If a role is specified and has weighted attributes, use weighted calculation
     if (role && roleAttributeWeights[role]) {
         const weightedAttrs = roleAttributeWeights[role];
-        const weightedWeight = 3.0; // Weighted attributes count more
+        const weightedWeight = 4.0; // Weighted attributes count more
         const normalWeight = 1.0;
         
         let sum = 0;
