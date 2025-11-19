@@ -1,0 +1,23 @@
+{
+  "name": "Example Player",
+  "position": "MID",
+  "attributes": {
+    "aerial": 12,
+    "crossing": 14,
+    "dribbling": 16,
+    "passing": 17,
+    "shooting": 15,
+    "tackling": 13,
+    "technique": 16,
+    "creativity": 17,
+    "decisions": 15,
+    "movement": 16,
+    "aggression": 12,
+    "positioning": 15,
+    "teamwork": 16,
+    "leadership": 14,
+    "pace": 15,
+    "stamina": 16,
+    "strength": 13
+  }
+}
