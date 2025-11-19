@@ -16,7 +16,7 @@ A Progressive Web App (PWA) for managing your Football Manager Mobile squad and 
 - Delete players from your squad
 
 ### ⚡ Formation System
-Support for 7 popular formations:
+Support for 14 popular formations:
 - 4-4-2 (Classic)
 - 4-3-3 (Attacking)
 - 3-5-2 (Wing play)
@@ -24,6 +24,13 @@ Support for 7 popular formations:
 - 4-5-1 (Defensive)
 - 3-4-3 (Aggressive)
 - 5-3-2 (Ultra defensive)
+- 4-1-4-1 (Holding midfielder)
+- 4-4-1-1 (False 9)
+- 3-4-1-2 (Wide midfield diamond)
+- 4-1-2-1-2 (Narrow diamond)
+- 5-4-1 (Ultra defensive counter)
+- 4-3-2-1 (Christmas tree)
+- 4-1-3-2 (Narrow attacking)
 
 ### 📊 Starting 11 Builder
 - Visual pitch representation
@@ -31,6 +38,8 @@ Support for 7 popular formations:
 - Real-time team average rating calculation
 - Easy player assignment and removal
 - Formation switching with player retention
+- **Drag-and-drop player repositioning** - Drag players between positions to rearrange your lineup
+- **Position swapping** - Click the "↔️ Swap" button on two players to swap their positions
 
 ### 💾 Data Persistence & Backup
 - All data stored locally in browser
@@ -148,10 +157,15 @@ Example JSON files are provided in the repository:
 
 #### Building Your Starting 11
 1. Go to the "Starting 11" tab
-2. Select your preferred formation from the dropdown
+2. Select your preferred formation from the dropdown (14 formations available)
 3. Click on any position slot (e.g., "GK +", "LB +")
 4. Select a player from the available options
 5. The team average rating updates automatically
+
+**Rearranging Players:**
+- **Drag-and-Drop**: Click and hold a player card, then drag it to another position to swap players
+- **Swap Button**: Click the "↔️ Swap" button on one player, then click the "↔️ Swap" button on another player to swap their positions
+- The selected player will be highlighted with an orange border while in swap mode
 
 #### Managing Your Squad
 1. Use the "Squad" tab to view all players
