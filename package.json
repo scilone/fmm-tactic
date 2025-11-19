@@ -1,0 +1,24 @@
+{
+  "name": "fmm-tactic",
+  "version": "1.0.0",
+  "description": "A Progressive Web App (PWA) for managing your Football Manager Mobile squad and starting 11. Build your dream team, organize formations, and track player ratings!",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "keywords": [
+    "football-manager",
+    "pwa",
+    "tactics",
+    "squad-management"
+  ],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "canvas": "^3.2.0",
+    "vite": "^7.2.2",
+    "vite-plugin-pwa": "^1.1.0"
+  }
+}

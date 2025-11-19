@@ -1,3 +1,7 @@
 create-icons.js
 node_modules/
 .DS_Store
+dist/
+*.log
+.vite/
+.cache/

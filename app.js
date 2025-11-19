@@ -523,11 +523,4 @@ function loadData() {
     }
 }
 
-// Service Worker Registration
-if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-        navigator.serviceWorker.register('/service-worker.js')
-            .then(registration => console.log('SW registered:', registration))
-            .catch(err => console.log('SW registration failed:', err));
-    });
-}
+// Service Worker Registration is handled automatically by Vite PWA plugin

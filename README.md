@@ -52,19 +52,31 @@ git clone https://github.com/scilone/fmm-tactic.git
 cd fmm-tactic
 ```
 
-2. Serve the files using any web server:
+2. Install dependencies:
 ```bash
-# Using Python
-python3 -m http.server 8080
-
-# Using Node.js
-npx http-server -p 8080
-
-# Using PHP
-php -S localhost:8080
+npm install
 ```
 
-3. Open your browser and navigate to `http://localhost:8080`
+3. Run the development server:
+```bash
+npm run dev
+```
+
+4. Open your browser and navigate to `http://localhost:5173`
+
+### Building for Production
+
+To build the app for production:
+```bash
+npm run build
+```
+
+The built files will be in the `dist/` directory.
+
+To preview the production build:
+```bash
+npm run preview
+```
 
 ### Usage
 
@@ -106,8 +118,9 @@ fmm-tactic/
 
 ### Technologies Used
 - Pure HTML5, CSS3, and JavaScript (no frameworks)
+- **Vite** - Modern build tool and development server
+- **Vite Plugin PWA** - Automated PWA and Service Worker generation
 - LocalStorage API for data persistence
-- Service Worker API for offline functionality
 - CSS Grid and Flexbox for responsive layout
 - PWA features (Web App Manifest)
 
