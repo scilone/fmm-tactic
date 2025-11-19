@@ -1184,6 +1184,36 @@ function swapPlayers(slotIndex1, slotIndex2) {
     
     if (!assignment1 || !assignment2) return;
     
+    // Get the positions for these slots
+    const formationDef = formations[currentFormation];
+    const slot1Position = formationDef[slotIndex1].position;
+    const slot2Position = formationDef[slotIndex2].position;
+    
+    // Get the players
+    const player1 = players.find(p => p.id === assignment1.playerId);
+    const player2 = players.find(p => p.id === assignment2.playerId);
+    
+    if (!player1 || !player2) return;
+    
+    // Check if both players can play in each other's positions
+    const player1Positions = getPlayerPositions(player1);
+    const player2Positions = getPlayerPositions(player2);
+    
+    const player1CanPlaySlot2 = player1Positions.includes(slot2Position);
+    const player2CanPlaySlot1 = player2Positions.includes(slot1Position);
+    
+    if (!player1CanPlaySlot2 || !player2CanPlaySlot1) {
+        let message = 'Cannot swap players:\n';
+        if (!player1CanPlaySlot2) {
+            message += `- ${player1.name} cannot play ${slot2Position} (positions: ${player1Positions.join(', ')})\n`;
+        }
+        if (!player2CanPlaySlot1) {
+            message += `- ${player2.name} cannot play ${slot1Position} (positions: ${player2Positions.join(', ')})`;
+        }
+        alert(message);
+        return;
+    }
+    
     // Swap the slot indices
     assignment1.slotIndex = slotIndex2;
     assignment2.slotIndex = slotIndex1;
