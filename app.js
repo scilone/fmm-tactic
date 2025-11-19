@@ -6,98 +6,98 @@ let lineup = [];
 let currentFormation = '4-4-2';
 let editingPlayerId = null;
 
-// Formation definitions
+// Formation definitions - updated to use specific positions
 const formations = {
     '4-4-2': [
         { label: 'GK', position: 'GK', row: 0 },
-        { label: 'LB', position: 'DEF', row: 1 },
-        { label: 'CB', position: 'DEF', row: 1 },
-        { label: 'CB', position: 'DEF', row: 1 },
-        { label: 'RB', position: 'DEF', row: 1 },
-        { label: 'LM', position: 'MID', row: 2 },
-        { label: 'CM', position: 'MID', row: 2 },
-        { label: 'CM', position: 'MID', row: 2 },
-        { label: 'RM', position: 'MID', row: 2 },
-        { label: 'ST', position: 'FWD', row: 3 },
-        { label: 'ST', position: 'FWD', row: 3 }
+        { label: 'LB', position: 'DL', row: 1 },
+        { label: 'CB', position: 'DC', row: 1 },
+        { label: 'CB', position: 'DC', row: 1 },
+        { label: 'RB', position: 'DR', row: 1 },
+        { label: 'LM', position: 'ML', row: 2 },
+        { label: 'CM', position: 'MC', row: 2 },
+        { label: 'CM', position: 'MC', row: 2 },
+        { label: 'RM', position: 'MR', row: 2 },
+        { label: 'ST', position: 'ST', row: 3 },
+        { label: 'ST', position: 'ST', row: 3 }
     ],
     '4-3-3': [
         { label: 'GK', position: 'GK', row: 0 },
-        { label: 'LB', position: 'DEF', row: 1 },
-        { label: 'CB', position: 'DEF', row: 1 },
-        { label: 'CB', position: 'DEF', row: 1 },
-        { label: 'RB', position: 'DEF', row: 1 },
-        { label: 'CM', position: 'MID', row: 2 },
-        { label: 'CM', position: 'MID', row: 2 },
-        { label: 'CM', position: 'MID', row: 2 },
-        { label: 'LW', position: 'FWD', row: 3 },
-        { label: 'ST', position: 'FWD', row: 3 },
-        { label: 'RW', position: 'FWD', row: 3 }
+        { label: 'LB', position: 'DL', row: 1 },
+        { label: 'CB', position: 'DC', row: 1 },
+        { label: 'CB', position: 'DC', row: 1 },
+        { label: 'RB', position: 'DR', row: 1 },
+        { label: 'CM', position: 'MC', row: 2 },
+        { label: 'CM', position: 'MC', row: 2 },
+        { label: 'CM', position: 'MC', row: 2 },
+        { label: 'LW', position: 'AML', row: 3 },
+        { label: 'ST', position: 'ST', row: 3 },
+        { label: 'RW', position: 'AMR', row: 3 }
     ],
     '3-5-2': [
         { label: 'GK', position: 'GK', row: 0 },
-        { label: 'CB', position: 'DEF', row: 1 },
-        { label: 'CB', position: 'DEF', row: 1 },
-        { label: 'CB', position: 'DEF', row: 1 },
-        { label: 'LM', position: 'MID', row: 2 },
-        { label: 'CM', position: 'MID', row: 2 },
-        { label: 'CM', position: 'MID', row: 2 },
-        { label: 'CM', position: 'MID', row: 2 },
-        { label: 'RM', position: 'MID', row: 2 },
-        { label: 'ST', position: 'FWD', row: 3 },
-        { label: 'ST', position: 'FWD', row: 3 }
+        { label: 'CB', position: 'DC', row: 1 },
+        { label: 'CB', position: 'DC', row: 1 },
+        { label: 'CB', position: 'DC', row: 1 },
+        { label: 'LM', position: 'ML', row: 2 },
+        { label: 'CM', position: 'MC', row: 2 },
+        { label: 'CM', position: 'MC', row: 2 },
+        { label: 'CM', position: 'MC', row: 2 },
+        { label: 'RM', position: 'MR', row: 2 },
+        { label: 'ST', position: 'ST', row: 3 },
+        { label: 'ST', position: 'ST', row: 3 }
     ],
     '4-2-3-1': [
         { label: 'GK', position: 'GK', row: 0 },
-        { label: 'LB', position: 'DEF', row: 1 },
-        { label: 'CB', position: 'DEF', row: 1 },
-        { label: 'CB', position: 'DEF', row: 1 },
-        { label: 'RB', position: 'DEF', row: 1 },
-        { label: 'CDM', position: 'MID', row: 2 },
-        { label: 'CDM', position: 'MID', row: 2 },
-        { label: 'LM', position: 'MID', row: 3 },
-        { label: 'CAM', position: 'MID', row: 3 },
-        { label: 'RM', position: 'MID', row: 3 },
-        { label: 'ST', position: 'FWD', row: 4 }
+        { label: 'LB', position: 'DL', row: 1 },
+        { label: 'CB', position: 'DC', row: 1 },
+        { label: 'CB', position: 'DC', row: 1 },
+        { label: 'RB', position: 'DR', row: 1 },
+        { label: 'CDM', position: 'DMC', row: 2 },
+        { label: 'CDM', position: 'DMC', row: 2 },
+        { label: 'LM', position: 'AML', row: 3 },
+        { label: 'CAM', position: 'AMC', row: 3 },
+        { label: 'RM', position: 'AMR', row: 3 },
+        { label: 'ST', position: 'ST', row: 4 }
     ],
     '4-5-1': [
         { label: 'GK', position: 'GK', row: 0 },
-        { label: 'LB', position: 'DEF', row: 1 },
-        { label: 'CB', position: 'DEF', row: 1 },
-        { label: 'CB', position: 'DEF', row: 1 },
-        { label: 'RB', position: 'DEF', row: 1 },
-        { label: 'LM', position: 'MID', row: 2 },
-        { label: 'CM', position: 'MID', row: 2 },
-        { label: 'CM', position: 'MID', row: 2 },
-        { label: 'CM', position: 'MID', row: 2 },
-        { label: 'RM', position: 'MID', row: 2 },
-        { label: 'ST', position: 'FWD', row: 3 }
+        { label: 'LB', position: 'DL', row: 1 },
+        { label: 'CB', position: 'DC', row: 1 },
+        { label: 'CB', position: 'DC', row: 1 },
+        { label: 'RB', position: 'DR', row: 1 },
+        { label: 'LM', position: 'ML', row: 2 },
+        { label: 'CM', position: 'MC', row: 2 },
+        { label: 'CM', position: 'MC', row: 2 },
+        { label: 'CM', position: 'MC', row: 2 },
+        { label: 'RM', position: 'MR', row: 2 },
+        { label: 'ST', position: 'ST', row: 3 }
     ],
     '3-4-3': [
         { label: 'GK', position: 'GK', row: 0 },
-        { label: 'CB', position: 'DEF', row: 1 },
-        { label: 'CB', position: 'DEF', row: 1 },
-        { label: 'CB', position: 'DEF', row: 1 },
-        { label: 'LM', position: 'MID', row: 2 },
-        { label: 'CM', position: 'MID', row: 2 },
-        { label: 'CM', position: 'MID', row: 2 },
-        { label: 'RM', position: 'MID', row: 2 },
-        { label: 'LW', position: 'FWD', row: 3 },
-        { label: 'ST', position: 'FWD', row: 3 },
-        { label: 'RW', position: 'FWD', row: 3 }
+        { label: 'CB', position: 'DC', row: 1 },
+        { label: 'CB', position: 'DC', row: 1 },
+        { label: 'CB', position: 'DC', row: 1 },
+        { label: 'LM', position: 'ML', row: 2 },
+        { label: 'CM', position: 'MC', row: 2 },
+        { label: 'CM', position: 'MC', row: 2 },
+        { label: 'RM', position: 'MR', row: 2 },
+        { label: 'LW', position: 'AML', row: 3 },
+        { label: 'ST', position: 'ST', row: 3 },
+        { label: 'RW', position: 'AMR', row: 3 }
     ],
     '5-3-2': [
         { label: 'GK', position: 'GK', row: 0 },
-        { label: 'LWB', position: 'DEF', row: 1 },
-        { label: 'CB', position: 'DEF', row: 1 },
-        { label: 'CB', position: 'DEF', row: 1 },
-        { label: 'CB', position: 'DEF', row: 1 },
-        { label: 'RWB', position: 'DEF', row: 1 },
-        { label: 'CM', position: 'MID', row: 2 },
-        { label: 'CM', position: 'MID', row: 2 },
-        { label: 'CM', position: 'MID', row: 2 },
-        { label: 'ST', position: 'FWD', row: 3 },
-        { label: 'ST', position: 'FWD', row: 3 }
+        { label: 'LWB', position: 'WBL', row: 1 },
+        { label: 'CB', position: 'DC', row: 1 },
+        { label: 'CB', position: 'DC', row: 1 },
+        { label: 'CB', position: 'DC', row: 1 },
+        { label: 'RWB', position: 'WBR', row: 1 },
+        { label: 'CM', position: 'MC', row: 2 },
+        { label: 'CM', position: 'MC', row: 2 },
+        { label: 'CM', position: 'MC', row: 2 },
+        { label: 'ST', position: 'ST', row: 3 },
+        { label: 'ST', position: 'ST', row: 3 }
     ]
 };
 
@@ -129,8 +129,10 @@ function setupEventListeners() {
     });
 
     // Position selector for GK attributes
-    const positionSelect = document.getElementById('player-position');
-    positionSelect.addEventListener('change', toggleGKAttributes);
+    const positionInputs = document.querySelectorAll('input[name="position"]');
+    positionInputs.forEach(input => {
+        input.addEventListener('change', toggleGKAttributes);
+    });
 
     // Formation selector
     const formationSelect = document.getElementById('formation');
@@ -163,10 +165,17 @@ function switchTab(tabName) {
 }
 
 // Toggle GK attributes visibility
+function getPlayerPositions(player) {
+    if (!player) return [];
+    if (Array.isArray(player.positions)) return player.positions;
+    if (player.position) return [player.position];
+    return [];
+}
+
 function toggleGKAttributes() {
-    const position = document.getElementById('player-position').value;
+    const selectedPositions = Array.from(document.querySelectorAll('input[name="position"]:checked')).map(i => i.value);
     const gkSection = document.getElementById('gk-attributes');
-    gkSection.style.display = position === 'GK' ? 'block' : 'none';
+    gkSection.style.display = selectedPositions.includes('GK') ? 'block' : 'none';
 }
 
 // Handle JSON import
@@ -188,15 +197,29 @@ function handleImportJSON() {
             document.getElementById('player-name').value = nameValue;
         }
         
-        // Pre-fill position if present and valid
+        // Pre-fill position(s) if present and valid
         const positionValue = data.position || data.Position;
-        if (positionValue !== undefined) {
-            const validPositions = ['GK', 'DEF', 'MID', 'FWD'];
-            if (validPositions.includes(positionValue)) {
-                document.getElementById('player-position').value = positionValue;
-                // Toggle GK attributes visibility if needed
-                toggleGKAttributes();
-            }
+        const positionsValue = data.positions || data.Positions;
+        const posMap = {
+            DEF: ['DL','DC','DR','WBL','WBR'],
+            MID: ['ML','MC','MR','DMC','AMC','AML','AMR'],
+            FWD: ['ST','AML','AMR']
+        };
+
+        let positionsToCheck = [];
+        if (Array.isArray(positionsValue) && positionsValue.length > 0) {
+            positionsToCheck = positionsValue;
+        } else if (positionValue !== undefined) {
+            // positionValue may be a broad category; map it to specific positions
+            if (posMap[positionValue]) positionsToCheck = posMap[positionValue];
+            else positionsToCheck = [positionValue];
+        }
+
+        if (positionsToCheck.length > 0) {
+            document.querySelectorAll('input[name="position"]').forEach(inp => {
+                inp.checked = positionsToCheck.includes(inp.value);
+            });
+            toggleGKAttributes();
         }
 
         // Pre-fill attributes if they exist (either in data.attributes or directly in data)
@@ -265,8 +288,8 @@ function handleImportJSON() {
         if (strength !== undefined) document.getElementById('attr-strength').value = strength;
         
         // GK-specific attributes (only if position is GK)
-        const currentPosition = document.getElementById('player-position').value;
-        if (currentPosition === 'GK') {
+        const checkPositions = Array.from(document.querySelectorAll('input[name="position"]:checked')).map(i => i.value);
+        if (checkPositions.includes('GK')) {
             const agility = getAttr(['agility', 'Agility', 'Agility (GK)']);
             if (agility !== undefined) document.getElementById('attr-agility').value = agility;
             
@@ -311,10 +334,18 @@ function showImportMessage(message, type) {
 function handleAddPlayer(e) {
     e.preventDefault();
 
+    const selectedInputs = document.querySelectorAll('input[name="position"]:checked');
+    if (!selectedInputs || selectedInputs.length === 0) {
+        alert('Please select at least one position');
+        return;
+    }
+    const selectedPositions = Array.from(selectedInputs).map(i => i.value);
+
     const player = {
         id: editingPlayerId || Date.now(),
         name: document.getElementById('player-name').value,
-        position: document.getElementById('player-position').value,
+        positions: selectedPositions,
+        position: selectedPositions[0],
         attributes: {
             aerial: parseInt(document.getElementById('attr-aerial').value),
             crossing: parseInt(document.getElementById('attr-crossing').value),
@@ -337,7 +368,7 @@ function handleAddPlayer(e) {
     };
 
     // Add GK-specific attributes if goalkeeper
-    if (player.position === 'GK') {
+    if (getPlayerPositions(player).includes('GK')) {
         player.attributes.agility = parseInt(document.getElementById('attr-agility').value);
         player.attributes.handling = parseInt(document.getElementById('attr-handling').value);
         player.attributes.kicking = parseInt(document.getElementById('attr-kicking').value);
@@ -384,7 +415,7 @@ function calculateRating(player) {
     });
 
     // Add GK attributes if goalkeeper
-    if (player.position === 'GK') {
+    if (getPlayerPositions(player).includes('GK')) {
         const gkAttrs = ['agility', 'handling', 'kicking', 'reflexes', 'throwing'];
         gkAttrs.forEach(attr => {
             if (attrs[attr]) {
@@ -405,7 +436,8 @@ function renderSquad() {
 
     let filteredPlayers = players.filter(player => {
         const matchesSearch = player.name.toLowerCase().includes(searchTerm);
-        const matchesPosition = positionFilter === 'all' || player.position === positionFilter;
+        const playerPositions = getPlayerPositions(player);
+        const matchesPosition = positionFilter === 'all' || playerPositions.includes(positionFilter);
         return matchesSearch && matchesPosition;
     });
 
@@ -426,7 +458,7 @@ function renderSquad() {
         <div class="player-card">
             <div class="player-card-header">
                 <span class="player-name">${player.name}</span>
-                <span class="player-position">${player.position}</span>
+                <span class="player-position">${(getPlayerPositions(player) || []).join(', ')}</span>
             </div>
             <div class="player-rating">Rating: ${calculateRating(player)}</div>
             <div class="player-actions">
@@ -453,7 +485,13 @@ window.editPlayer = function editPlayer(id) {
 
     // Populate form with player data
     document.getElementById('player-name').value = player.name;
-    document.getElementById('player-position').value = player.position;
+    
+    // Set the radio button for position
+    // check all position inputs that belong to that player
+    const positions = getPlayerPositions(player);
+    document.querySelectorAll('input[name="position"]').forEach(inp => {
+        inp.checked = positions.includes(inp.value);
+    });
     
     // Set all attributes
     document.getElementById('attr-aerial').value = player.attributes.aerial;
@@ -475,7 +513,7 @@ window.editPlayer = function editPlayer(id) {
     document.getElementById('attr-leadership').value = player.attributes.leadership;
 
     // Set GK attributes if goalkeeper
-    if (player.position === 'GK') {
+    if (getPlayerPositions(player).includes('GK')) {
         document.getElementById('attr-agility').value = player.attributes.agility || 10;
         document.getElementById('attr-handling').value = player.attributes.handling || 10;
         document.getElementById('attr-kicking').value = player.attributes.kicking || 10;
@@ -522,18 +560,19 @@ window.addToLineup = function addToLineup(playerId) {
     const formationDef = formations[currentFormation];
     const availableSlots = formationDef
         .map((slot, index) => ({ ...slot, index }))
-        .filter(slot => {
+            .filter(slot => {
             const slotFilled = lineup.find(l => l.slotIndex === slot.index);
-            return !slotFilled && slot.position === player.position;
+            const playerPositions = getPlayerPositions(player);
+            return !slotFilled && playerPositions.includes(slot.position);
         });
 
     if (availableSlots.length === 0) {
-        alert(`No available ${player.position} positions in current formation`);
+        alert(`No available ${(getPlayerPositions(player) || [])[0] || 'position'} positions in current formation`);
         return;
     }
 
     // If only one slot, assign directly
-    if (availableSlots.length === 1) {
+        if (availableSlots.length === 1) {
         lineup.push({
             slotIndex: availableSlots[0].index,
             playerId: player.id
@@ -621,7 +660,7 @@ function renderLineup() {
         rows[slot.row].push({ ...slot, index });
     });
 
-    const rowsHTML = Object.keys(rows).sort().map(rowNum => {
+    const rowsHTML = Object.keys(rows).sort((a,b)=>b-a).map(rowNum => {
         const rowSlots = rows[rowNum];
         const slotsHTML = rowSlots.map(slot => {
             const assignment = lineup.find(l => l.slotIndex === slot.index);
@@ -659,7 +698,8 @@ function renderLineup() {
 window.selectPlayerForSlot = function selectPlayerForSlot(slotIndex, position) {
     const availablePlayers = players.filter(p => {
         // Check if player matches position
-        if (p.position !== position) return false;
+        const playerPositions = getPlayerPositions(p);
+        if (!playerPositions.includes(position)) return false;
         // Check if player is not already in lineup
         return !lineup.find(l => l.playerId === p.id);
     });
@@ -682,7 +722,7 @@ window.selectPlayerForSlot = function selectPlayerForSlot(slotIndex, position) {
                 <div class="modal-player-item" onclick="assignToSlot(${player.id}, ${slotIndex})">
                     <div class="modal-player-name">${player.name}</div>
                     <div class="modal-player-info">
-                        <span>${player.position}</span>
+                        <span>${(getPlayerPositions(player) || []).join(', ')}</span>
                         <span>Rating: ${calculateRating(player)}</span>
                     </div>
                 </div>

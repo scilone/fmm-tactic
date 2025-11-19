@@ -416,6 +416,69 @@ header h1 {
     box-shadow: 0 2px 4px var(--shadow);
 }
 
+/* Position Grid - Football field layout */
+.position-grid {
+    background: var(--pitch-green);
+    border: 3px solid white;
+    border-radius: 10px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-top: 10px;
+}
+
+.position-row {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+}
+
+.position-row-1 {
+    justify-content: center;
+}
+
+.position-row-3 {
+    justify-content: space-around;
+}
+
+.position-option {
+    background: rgba(255, 255, 255, 0.9);
+    border: 2px solid white;
+    border-radius: 8px;
+    padding: 12px 20px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 80px;
+    font-weight: 600;
+    color: var(--primary-color);
+}
+
+.position-option:hover {
+    background: white;
+    border-color: var(--accent-color);
+    transform: scale(1.05);
+}
+
+.position-option input[type="radio"],
+.position-option input[type="checkbox"] {
+    display: none;
+}
+.position-option input[type="radio"]:checked + span,
+.position-option input[type="checkbox"]:checked + span {
+    color: white;
+}
+
+.position-option:has(input[type="radio"]:checked),
+.position-option:has(input[type="checkbox"]:checked) {
+    background: var(--accent-color);
+    border-color: var(--accent-color);
+    color: white;
+}
+
 .form-group {
     margin-bottom: 15px;
 }
