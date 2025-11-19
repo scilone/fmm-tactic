@@ -449,24 +449,21 @@ function handleImportJSON() {
         const strength = getAttr(['strength', 'Strength']);
         if (strength !== undefined) document.getElementById('attr-strength').value = strength;
         
-        // GK-specific attributes (only if position is GK)
-        const checkPositions = Array.from(document.querySelectorAll('input[name="position"]:checked')).map(i => i.value);
-        if (checkPositions.includes('GK')) {
-            const agility = getAttr(['agility', 'Agility', 'Agility (GK)']);
-            if (agility !== undefined) document.getElementById('attr-agility').value = agility;
-            
-            const handling = getAttr(['handling', 'Handling', 'Handling (GK)']);
-            if (handling !== undefined) document.getElementById('attr-handling').value = handling;
-            
-            const kicking = getAttr(['kicking', 'Kicking', 'Kicking (GK)']);
-            if (kicking !== undefined) document.getElementById('attr-kicking').value = kicking;
-            
-            const reflexes = getAttr(['reflexes', 'Reflexes', 'Reflexes (GK)']);
-            if (reflexes !== undefined) document.getElementById('attr-reflexes').value = reflexes;
-            
-            const throwing = getAttr(['throwing', 'Throwing', 'Throwing (GK)']);
-            if (throwing !== undefined) document.getElementById('attr-throwing').value = throwing;
-        }
+        // GK-specific attributes (populate if they exist in JSON)
+        const agility = getAttr(['agility', 'Agility', 'Agility (GK)']);
+        if (agility !== undefined) document.getElementById('attr-agility').value = agility;
+        
+        const handling = getAttr(['handling', 'Handling', 'Handling (GK)']);
+        if (handling !== undefined) document.getElementById('attr-handling').value = handling;
+        
+        const kicking = getAttr(['kicking', 'Kicking', 'Kicking (GK)']);
+        if (kicking !== undefined) document.getElementById('attr-kicking').value = kicking;
+        
+        const reflexes = getAttr(['reflexes', 'Reflexes', 'Reflexes (GK)']);
+        if (reflexes !== undefined) document.getElementById('attr-reflexes').value = reflexes;
+        
+        const throwing = getAttr(['throwing', 'Throwing', 'Throwing (GK)']);
+        if (throwing !== undefined) document.getElementById('attr-throwing').value = throwing;
 
         showImportMessage('✓ Player data imported successfully! Review and click "Add Player" to save.', 'success');
         
