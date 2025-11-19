@@ -194,6 +194,63 @@ const positionRoles = {
     ]
 };
 
+// Role-specific attribute weights
+// Each role has an array of attribute names that are more important
+const roleAttributeWeights = {
+    // GK roles
+    'Goalkeeper': ['handling', 'aerial', 'throwing', 'kicking', 'reflexes'],
+    'Sweeper Keeper': ['handling', 'aerial', 'throwing', 'reflexes', 'technique', 'pace'],
+    
+    // DC roles
+    'Central Defender': ['tackling', 'positioning', 'decisions', 'aerial', 'strength'],
+    'No-Nonsense Center-Back': ['tackling', 'positioning', 'decisions', 'strength', 'aerial'],
+    'Sweeper': ['tackling', 'positioning', 'decisions'],
+    'Ball Playing Defender': ['tackling', 'positioning', 'decisions', 'passing', 'dribbling'],
+    'Wide Center Back': ['tackling', 'positioning', 'decisions', 'passing'],
+    'Libero': ['movement', 'decisions', 'creativity', 'shooting', 'pace'],
+    
+    // DL/DR roles
+    'Full-Back': ['tackling', 'positioning', 'decisions', 'pace', 'passing'],
+    'Inverted Full Back': ['tackling', 'positioning', 'decisions', 'passing'],
+    'Inverted Wing Back': ['tackling', 'positioning', 'decisions', 'pace', 'passing'],
+    'Defensive Full Back': ['tackling', 'positioning', 'decisions', 'pace'],
+    'Wing-Back': ['stamina', 'positioning', 'pace', 'crossing', 'dribbling'],
+    
+    // DMC roles
+    'Defensive Midfielder': ['tackling', 'positioning', 'decisions', 'positioning'],
+    'Anchor': ['tackling', 'positioning', 'decisions', 'strength'],
+    'Roaming Playmaker': ['decisions', 'movement', 'creativity', 'shooting', 'passing', 'teamwork'],
+    'Deep Lying Playmaker': ['passing', 'creativity', 'movement', 'decisions'],
+    'Ball Winning Midfielder': ['tackling', 'positioning', 'aerial', 'strength', 'decisions'],
+    
+    // MC roles
+    'Central Midfielder': ['aerial', 'movement', 'passing', 'decisions', 'tackling', 'positioning'],
+    'Box To Box Midfielder': ['movement', 'positioning', 'stamina', 'decisions', 'tackling', 'passing'],
+    'Advanced Playmaker': ['passing', 'creativity', 'movement', 'decisions'],
+    
+    // ML/MR roles
+    'Wide Midfielder': ['passing', 'positioning', 'movement', 'decisions', 'tackling'],
+    'Defensive Winger': ['crossing', 'tackling', 'positioning', 'decisions', 'passing'],
+    'Winger': ['crossing', 'dribbling', 'movement', 'decisions', 'pace'],
+    'Inverted Winger': ['movement', 'dribbling', 'positioning', 'decisions', 'passing'],
+    
+    // AML/AMR roles
+    'Inside Forward': ['shooting', 'dribbling', 'movement', 'pace', 'decisions', 'passing'],
+    
+    // AMC roles
+    'Attacking Midfielder': ['movement', 'passing', 'decisions'],
+    'Trequartista': ['movement', 'decisions', 'creativity', 'shooting', 'pace', 'strength', 'aerial'],
+    'Shadow Striker': ['movement', 'decisions', 'creativity', 'shooting', 'pace'],
+    
+    // ST roles
+    'Poacher': ['movement', 'pace', 'technique', 'shooting', 'decisions'],
+    'Deep Lying Forward': ['movement', 'decisions', 'creativity', 'passing'],
+    'Complete Forward': ['movement', 'decisions', 'creativity', 'shooting', 'pace', 'strength', 'aerial'],
+    'Target Forward': ['strength', 'aerial', 'movement', 'shooting'],
+    'Advanced Forward': ['movement', 'decisions', 'shooting', 'pace'],
+    'Pressing Forward': ['movement', 'decisions', 'strength', 'teamwork', 'tackling']
+};
+
 // Initialize app
 document.addEventListener('DOMContentLoaded', () => {
     loadData();
@@ -503,8 +560,47 @@ function handleAddPlayer(e) {
 }
 
 // Calculate player rating
-function calculateRating(player) {
+function calculateRating(player, role = null) {
     const attrs = player.attributes;
+    
+    // If a role is specified and has weighted attributes, use weighted calculation
+    if (role && roleAttributeWeights[role]) {
+        const weightedAttrs = roleAttributeWeights[role];
+        const weightedWeight = 2.0; // Weighted attributes count double
+        const normalWeight = 1.0;
+        
+        let sum = 0;
+        let totalWeight = 0;
+        
+        // All attributes to consider
+        const standardAttrs = ['aerial', 'crossing', 'dribbling', 'passing', 'shooting', 
+                               'tackling', 'technique', 'creativity', 'decisions', 'movement',
+                               'aggression', 'positioning', 'teamwork', 'pace', 'stamina', 
+                               'strength', 'leadership'];
+        
+        // Process standard attributes
+        standardAttrs.forEach(attr => {
+            const weight = weightedAttrs.includes(attr) ? weightedWeight : normalWeight;
+            sum += attrs[attr] * weight;
+            totalWeight += weight;
+        });
+        
+        // Add GK attributes if goalkeeper
+        if (getPlayerPositions(player).includes('GK')) {
+            const gkAttrs = ['agility', 'handling', 'kicking', 'reflexes', 'throwing'];
+            gkAttrs.forEach(attr => {
+                if (attrs[attr]) {
+                    const weight = weightedAttrs.includes(attr) ? weightedWeight : normalWeight;
+                    sum += attrs[attr] * weight;
+                    totalWeight += weight;
+                }
+            });
+        }
+        
+        return (sum / totalWeight).toFixed(1);
+    }
+    
+    // Default calculation without role (backward compatibility)
     let sum = 0;
     let count = 0;
 
@@ -875,12 +971,13 @@ function renderLineup() {
             if (player) {
                 const role = assignment.role || '';
                 const roleDisplay = role ? `<div class="position-role">${role}</div>` : '';
+                const rating = calculateRating(player, role);
                 return `
                     <div class="position-slot filled" onclick="changeRole(${slot.index}, '${slot.position}')">
                         <div class="position-label">${slot.label}</div>
                         <div class="position-player">${player.name}</div>
                         ${roleDisplay}
-                        <div class="position-rating">${calculateRating(player)}</div>
+                        <div class="position-rating">${rating}</div>
                         <button class="position-remove" onclick="removeFromLineup(${slot.index}); event.stopPropagation();">Remove</button>
                     </div>
                 `;
@@ -950,20 +1047,21 @@ function updateTeamAverage() {
         return;
     }
 
-    const lineupPlayers = lineup.map(slot => 
-        players.find(p => p.id === slot.playerId)
-    ).filter(p => p);
+    const lineupPlayersWithRoles = lineup.map(slot => {
+        const player = players.find(p => p.id === slot.playerId);
+        return player ? { player, role: slot.role } : null;
+    }).filter(item => item !== null);
 
-    if (lineupPlayers.length === 0) {
+    if (lineupPlayersWithRoles.length === 0) {
         document.getElementById('team-avg').textContent = '0.0';
         return;
     }
 
-    const totalRating = lineupPlayers.reduce((sum, player) => 
-        sum + parseFloat(calculateRating(player)), 0
+    const totalRating = lineupPlayersWithRoles.reduce((sum, item) => 
+        sum + parseFloat(calculateRating(item.player, item.role)), 0
     );
     
-    const average = (totalRating / lineupPlayers.length).toFixed(1);
+    const average = (totalRating / lineupPlayersWithRoles.length).toFixed(1);
     document.getElementById('team-avg').textContent = average;
 }
 
