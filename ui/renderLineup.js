@@ -47,11 +47,11 @@ export function renderLineup() {
       const player = assignment ? state.players.find(p => p.id === assignment.playerId) : null;
       if (player) {
         const role = assignment.role || '';
-        const roleDisplay = role ? `<div class="position-role">${role}</div>` : '';
+        const roleDisplay = role ? `<div class="position-role" data-action="change-role" data-slot="${slot.index}" data-position="${slot.position}" data-player="${player.id}" title="Click to change role">${role}</div>` : '';
         const rating = calculateRating(player, slot.position, role);
         return `<div class="position-slot filled" draggable="true" data-slot-index="${slot.index}" data-position="${slot.position}">
           <div class="position-label">${slot.label}</div>
-          <div class="position-player">${player.name}</div>
+          <div class="position-player" data-action="change-player" data-slot="${slot.index}" data-position="${slot.position}" data-current-role="${role}" title="Click to change player">${player.name}</div>
           ${roleDisplay}
           <div class="position-rating">${rating}</div>
           <button class="position-remove" data-action="remove-slot" data-slot="${slot.index}">Remove</button>
