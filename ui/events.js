@@ -173,7 +173,8 @@ export function setupEventListeners() {
     if (assignPlayerWithRoleTarget) {
       const playerId = parseInt(assignPlayerWithRoleTarget.dataset.player);
       const slotIndex = parseInt(assignPlayerWithRoleTarget.dataset.slot);
-      const role = assignPlayerWithRoleTarget.dataset.role || null;
+      const roleData = assignPlayerWithRoleTarget.dataset.role;
+      const role = (roleData && roleData.trim() !== '') ? roleData : null;
       assignPlayerToLineup(playerId, slotIndex, role);
     }
 
@@ -383,11 +384,14 @@ function showPlayerListForSlot(slotIndex, position, role) {
   }
   
   // Calculate ratings once and store with player data for efficiency
-  const playersWithRatings = available.map(player => ({
-    player,
-    rating: role ? calculateRating(player, position, role) : calculateRating(player),
-    ratingValue: parseFloat(role ? calculateRating(player, position, role) : calculateRating(player))
-  }));
+  const playersWithRatings = available.map(player => {
+    const rating = role ? calculateRating(player, position, role) : calculateRating(player);
+    return {
+      player,
+      rating,
+      ratingValue: parseFloat(rating)
+    };
+  });
   
   // Sort by rating value
   playersWithRatings.sort((a, b) => b.ratingValue - a.ratingValue);
