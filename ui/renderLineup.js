@@ -7,12 +7,27 @@ export function renderLineup() {
   const pitch = document.getElementById('pitch');
   if (!pitch) return;
   const formationDef = formations[state.currentFormation];
+  const isCustom = state.currentFormation === 'Custom';
+  
+  // Check if we have more than 11 players selected in custom formation
+  if (isCustom && state.lineup.length > 11) {
+    // Remove excess players (keep first 11)
+    state.lineup = state.lineup.slice(0, 11);
+  }
+
   const rows = {};
   formationDef.forEach((slot, index) => { if (!rows[slot.row]) rows[slot.row] = []; rows[slot.row].push({ ...slot, index }); });
 
   const rowsHTML = Object.keys(rows).sort((a,b)=>b-a).map(rowNum => {
     const rowSlots = rows[rowNum];
     const slotsHTML = rowSlots.map(slot => {
+      // Handle non-selectable slots for custom formation
+      if (isCustom && slot.selectable === false) {
+        return `<div class="position-slot non-selectable" data-slot-index="${slot.index}">
+          <div class="position-label"></div>
+        </div>`;
+      }
+      
       const assignment = state.lineup.find(l => l.slotIndex === slot.index);
       const player = assignment ? state.players.find(p => p.id === assignment.playerId) : null;
       if (player) {
@@ -33,10 +48,10 @@ export function renderLineup() {
         <div style="color: white; margin-top: 10px;">+</div>
       </div>`;
     }).join('');
-    return `<div class="pitch-row">${slotsHTML}</div>`;
+    return `<div class="pitch-row ${isCustom ? 'pitch-row-custom' : ''}">${slotsHTML}</div>`;
   }).join('');
 
-  pitch.innerHTML = `<div class="pitch-positions">${rowsHTML}</div>`;
+  pitch.innerHTML = `<div class="pitch-positions ${isCustom ? 'pitch-custom' : ''}">${rowsHTML}</div>`;
   updateTeamAverage();
 
   if (state.swapMode && state.firstSwapSlotIndex !== null) {
