@@ -57,6 +57,22 @@ export function setupEventListeners() {
     }
   });
 
+  // Modal close buttons
+  document.addEventListener('click', e => {
+    if (e.target.closest('[data-action="close-player-modal"]')) {
+      closePlayerDetailsModal();
+    }
+    if (e.target.closest('[data-action="close-modal"]')) {
+      closeModal();
+    }
+    
+    // Close player details modal when clicking outside content
+    const playerModal = document.getElementById('player-details-modal');
+    if (e.target === playerModal) {
+      closePlayerDetailsModal();
+    }
+  });
+
   // Pitch interactions
   document.getElementById('pitch')?.addEventListener('click', e => {
     const slot = e.target.closest('.position-slot');

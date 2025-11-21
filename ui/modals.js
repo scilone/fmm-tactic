@@ -3,8 +3,10 @@ import { getPlayerPositions, state } from '../models/state.js';
 import { positionRoles } from '../config/roles.js';
 
 export function createModal() {
-  const existing = document.querySelector('.modal');
-  if (existing) existing.remove();
+  const modals = document.querySelectorAll('.modal');
+  modals.forEach(m => {
+    if (m.id !== 'player-details-modal') m.remove();
+  });
   const modal = document.createElement('div');
   modal.className = 'modal';
   modal.onclick = (e) => { if (e.target === modal) closeModal(); };
@@ -15,8 +17,14 @@ export function createModal() {
 }
 
 export function closeModal() {
-  const modal = document.querySelector('.modal');
-  if (modal) modal.remove();
+  const modals = document.querySelectorAll('.modal');
+  modals.forEach(modal => {
+    if (modal.id !== 'player-details-modal') {
+      modal.remove();
+    } else {
+      modal.classList.remove('active');
+    }
+  });
 }
 
 export function showPositionModal(player, slots, assignFn) {
@@ -38,7 +46,7 @@ export function showRoleSelectionModal(playerId, slotIndex, position, roles, ass
 }
 
 export function viewPlayerDetails(playerId) {
-  const player = state.players.find(p => p.id === playerId);
+  const player = state.players.find(p => p.id == playerId);
   if (!player) return;
   const modal = document.getElementById('player-details-modal');
   if (!modal) return;

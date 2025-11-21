@@ -25,15 +25,13 @@ export function renderSquad() {
   }
 
   squadList.innerHTML = filtered.map(player => `
-    <div class="player-card">
+    <div class="player-card" data-action="view-details" data-id="${player.id}">
       <div class="player-card-header">
         <span class="player-name">${player.name}</span>
         <span class="player-position">${getPlayerPositions(player).join(', ')}</span>
       </div>
       <div class="player-rating">Rating: ${calculateRating(player)}</div>
       <div class="player-actions">
-        <button class="btn btn-primary btn-small" data-action="view-details" data-id="${player.id}">📊 View Details</button>
-        <button class="btn btn-primary btn-small" data-action="add-lineup" data-id="${player.id}">Add to Lineup</button>
         <button class="btn btn-secondary btn-small" data-action="edit-player" data-id="${player.id}">Edit</button>
         <button class="btn btn-danger btn-small" data-action="delete-player" data-id="${player.id}">Delete</button>
       </div>
