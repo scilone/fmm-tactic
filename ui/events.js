@@ -226,6 +226,8 @@ function addToLineup(playerId) {
     .filter(slot => {
       // Filter out non-selectable slots in custom formation
       if (isCustom && slot.selectable === false) return false;
+      // Filter out slots without a valid position
+      if (!slot.position) return false;
       return !state.lineup.find(l => l.slotIndex === slot.index) && getPlayerPositions(player).includes(slot.position);
     });
   if (!available.length) { alert('No available position for player'); return; }

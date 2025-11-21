@@ -12,7 +12,9 @@ export function renderLineup() {
   // Check if we have more than 11 players selected in custom formation
   if (isCustom && state.lineup.length > 11) {
     // Remove excess players (keep first 11)
+    const removed = state.lineup.length - 11;
     state.lineup = state.lineup.slice(0, 11);
+    console.warn(`Custom formation limited to 11 players. Removed ${removed} player(s).`);
   }
 
   const rows = {};
