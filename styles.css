@@ -800,6 +800,10 @@ input[type="number"].attr-value-15-20 {
     font-size: 0.9em;
 }
 
+.modal-player-item.hidden {
+    display: none;
+}
+
 /* Drag and Drop Styles */
 .position-slot.filled {
     cursor: move;

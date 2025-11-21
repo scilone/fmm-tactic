@@ -427,14 +427,15 @@ function showPlayerListForSlot(slotIndex, position, role) {
       playerItems.forEach(item => {
         const playerName = item.dataset.playerName || '';
         if (playerName.includes(searchTerm)) {
-          item.style.display = '';
+          item.classList.remove('hidden');
         } else {
-          item.style.display = 'none';
+          item.classList.add('hidden');
         }
       });
     });
     
-    // Focus the search input for better UX
+    // Focus the search input after modal is rendered for better UX
+    // Small delay ensures modal is fully visible before focusing
     setTimeout(() => searchInput.focus(), 100);
   }
 }
