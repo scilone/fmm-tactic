@@ -173,16 +173,8 @@ export function setupEventListeners() {
     if (assignPlayerWithRoleTarget) {
       const playerId = parseInt(assignPlayerWithRoleTarget.dataset.player);
       const slotIndex = parseInt(assignPlayerWithRoleTarget.dataset.slot);
-      const role = assignPlayerWithRoleTarget.dataset.role;
-      if (role) {
-        assignWithRole(playerId, slotIndex, role);
-      } else {
-        // No role for this position
-        state.lineup.push({ slotIndex, playerId });
-        saveData();
-        renderLineup();
-        closeModal();
-      }
+      const role = assignPlayerWithRoleTarget.dataset.role || null;
+      assignPlayerToLineup(playerId, slotIndex, role);
     }
 
     const playerModal = document.getElementById('player-details-modal');
@@ -294,12 +286,22 @@ function assignToSlot(playerId, slotIndex) {
   
   const position = formationDef[slotIndex].position;
   const roles = positionRoles[position] || [];
-  if (!roles.length) { state.lineup.push({ slotIndex, playerId }); saveData(); renderLineup(); closeModal(); return; }
+  if (!roles.length) { assignPlayerToLineup(playerId, slotIndex); return; }
   showRoleSelectionModal(playerId, slotIndex, position, roles);
 }
 
 function assignWithRole(playerId, slotIndex, role) {
-  state.lineup.push({ slotIndex, playerId, role }); saveData(); renderLineup(); closeModal();
+  assignPlayerToLineup(playerId, slotIndex, role);
+}
+
+// Helper function to reduce code duplication
+function assignPlayerToLineup(playerId, slotIndex, role = null) {
+  const assignment = { slotIndex, playerId };
+  if (role) assignment.role = role;
+  state.lineup.push(assignment);
+  saveData();
+  renderLineup();
+  closeModal();
 }
 
 function changeRole(slotIndex, position) {
@@ -380,18 +382,20 @@ function showPlayerListForSlot(slotIndex, position, role) {
     return; 
   }
   
-  // Sort by role-specific rating if role is provided, otherwise general rating
-  if (role) {
-    available.sort((a,b)=>parseFloat(calculateRating(b, position, role)) - parseFloat(calculateRating(a, position, role)));
-  } else {
-    available.sort((a,b)=>parseFloat(calculateRating(b)) - parseFloat(calculateRating(a)));
-  }
+  // Calculate ratings once and store with player data for efficiency
+  const playersWithRatings = available.map(player => ({
+    player,
+    rating: role ? calculateRating(player, position, role) : calculateRating(player),
+    ratingValue: parseFloat(role ? calculateRating(player, position, role) : calculateRating(player))
+  }));
+  
+  // Sort by rating value
+  playersWithRatings.sort((a, b) => b.ratingValue - a.ratingValue);
   
   const modal = createModal();
   const content = modal.querySelector('.modal-content');
   const roleText = role ? ` - ${role}` : '';
-  const playerItems = available.map(player => {
-    const rating = role ? calculateRating(player, position, role) : calculateRating(player);
+  const playerItems = playersWithRatings.map(({ player, rating }) => {
     return `<div class="modal-player-item" data-action="assign-player-with-role" data-player="${player.id}" data-slot="${slotIndex}" data-role="${role || ''}"><div class="modal-player-name">${player.name}</div><div class="modal-player-info"><span>${getPlayerPositions(player).join(', ')}</span><span>Rating: ${rating}</span></div></div>`;
   }).join('');
   
