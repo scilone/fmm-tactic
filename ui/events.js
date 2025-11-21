@@ -6,7 +6,7 @@ import { renderLineup } from './renderLineup.js';
 import { calculateRating } from '../services/rating.js';
 import { saveData } from '../services/storage.js';
 import { exportData, importDataFile } from '../services/importExport.js';
-import { createModal, showPositionModal, showRoleSelectionModal, viewPlayerDetails, closeModal, closePlayerDetailsModal } from './modals.js';
+import { createModal, showPositionModal, showRoleSelectionModal, viewPlayerDetails, closeModal, closePlayerDetailsModal, showRoleChangeModal, showPlayerChangeModal } from './modals.js';
 
 export function setupEventListeners() {
   // Tab buttons
@@ -88,8 +88,24 @@ export function setupEventListeners() {
     const position = slot.dataset.position;
     const removeBtn = e.target.closest('[data-action="remove-slot"]');
     const swapBtn = e.target.closest('[data-action="swap-slot"]');
+    const changeRoleBtn = e.target.closest('[data-action="change-role"]');
+    const changePlayerBtn = e.target.closest('[data-action="change-player"]');
+    
     if (removeBtn) { removeFromLineup(slotIndex); return; }
     if (swapBtn) { startSwapMode(slotIndex); return; }
+    if (changeRoleBtn) { 
+      const playerId = parseInt(changeRoleBtn.dataset.player);
+      const position = changeRoleBtn.dataset.position;
+      handleRoleClick(playerId, slotIndex, position); 
+      return; 
+    }
+    if (changePlayerBtn) {
+      const position = changePlayerBtn.dataset.position;
+      const currentRole = changePlayerBtn.dataset.currentRole;
+      handlePlayerNameClick(slotIndex, position, currentRole);
+      return;
+    }
+    
     const assignment = state.lineup.find(l => l.slotIndex === slotIndex);
     if (assignment) {
       handleSlotClick(slotIndex, position);
@@ -158,6 +174,13 @@ export function setupEventListeners() {
       assignWithRole(playerId, slotIndex, role);
     }
 
+    const updateRoleTarget = e.target.closest('[data-action="update-role"]');
+    if (updateRoleTarget) {
+      const slotIndex = parseInt(updateRoleTarget.dataset.slot);
+      const role = updateRoleTarget.dataset.role;
+      updateRole(slotIndex, role);
+    }
+
     // New action: select role first for empty slot
     const selectRoleTarget = e.target.closest('[data-action="select-role-for-slot"]');
     if (selectRoleTarget) {
@@ -176,6 +199,16 @@ export function setupEventListeners() {
       const roleData = assignPlayerWithRoleTarget.dataset.role;
       const role = (roleData && roleData.trim() !== '') ? roleData : null;
       assignPlayerToLineup(playerId, slotIndex, role);
+    }
+
+    // New action: replace player in a filled slot
+    const replacePlayerTarget = e.target.closest('[data-action="replace-player"]');
+    if (replacePlayerTarget) {
+      const playerId = parseInt(replacePlayerTarget.dataset.player);
+      const slotIndex = parseInt(replacePlayerTarget.dataset.slot);
+      const roleData = replacePlayerTarget.dataset.role;
+      const role = (roleData && roleData.trim() !== '') ? roleData : null;
+      replacePlayer(playerId, slotIndex, role);
     }
 
     const playerModal = document.getElementById('player-details-modal');
@@ -536,5 +569,29 @@ function updateAttributeColor() {
   else if (value >= 15 && value <= 20) this.classList.add('attr-value-15-20');
 }
 
+// New handlers for separate role and player name clicks
+function handleRoleClick(playerId, slotIndex, position) {
+  showRoleChangeModal(playerId, slotIndex, position);
+}
+
+function handlePlayerNameClick(slotIndex, position, currentRole) {
+  showPlayerChangeModal(slotIndex, position, currentRole);
+}
+
+function replacePlayer(playerId, slotIndex, role) {
+  // Remove the existing player and add the new one
+  const assignment = state.lineup.find(l => l.slotIndex === slotIndex);
+  if (!assignment) return;
+  
+  assignment.playerId = playerId;
+  if (role) {
+    assignment.role = role;
+  }
+  
+  saveData();
+  renderLineup();
+  closeModal();
+}
+
 // Expose functions for window binding in main.js
-export const exposed = { assignToSlot, assignWithRole, updateRole, removeFromLineup, addToLineup, editPlayer, deletePlayer, selectPlayerForSlot, handleSlotClick, viewPlayerDetails, startSwapMode, changeRole, toggleGKAttributes, closePlayerDetailsModal, showPlayerListForSlot, showRoleSelectionForSlot };
+export const exposed = { assignToSlot, assignWithRole, updateRole, removeFromLineup, addToLineup, editPlayer, deletePlayer, selectPlayerForSlot, handleSlotClick, viewPlayerDetails, startSwapMode, changeRole, toggleGKAttributes, closePlayerDetailsModal, showPlayerListForSlot, showRoleSelectionForSlot, handleRoleClick, handlePlayerNameClick, replacePlayer };
