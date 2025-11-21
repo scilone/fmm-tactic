@@ -399,13 +399,44 @@ function showPlayerListForSlot(slotIndex, position, role) {
   const modal = createModal();
   const content = modal.querySelector('.modal-content');
   const roleText = role ? ` - ${role}` : '';
-  const playerItems = playersWithRatings.map(({ player, rating }) => {
-    return `<div class="modal-player-item" data-action="assign-player-with-role" data-player="${player.id}" data-slot="${slotIndex}" data-role="${role || ''}"><div class="modal-player-name">${player.name}</div><div class="modal-player-info"><span>${getPlayerPositions(player).join(', ')}</span><span>Rating: ${rating}</span></div></div>`;
-  }).join('');
+  
+  // Create player items HTML
+  const renderPlayerItems = (players) => {
+    return players.map(({ player, rating }) => {
+      return `<div class="modal-player-item" data-action="assign-player-with-role" data-player="${player.id}" data-slot="${slotIndex}" data-role="${role || ''}" data-player-name="${player.name.toLowerCase()}"><div class="modal-player-name">${player.name}</div><div class="modal-player-info"><span>${getPlayerPositions(player).join(', ')}</span><span>Rating: ${rating}</span></div></div>`;
+    }).join('');
+  };
   
   content.innerHTML = `<div class="modal-header"><h3>Select ${position} Player${roleText}</h3><button class="modal-close" data-action="close-modal">×</button></div>
-    <div class="modal-player-list">${playerItems}</div>`;
-  document.body.appendChild(modal); modal.classList.add('active');
+    <div class="modal-search-container">
+      <input type="text" class="modal-search-input" placeholder="Search player by name..." autocomplete="off">
+    </div>
+    <div class="modal-player-list">${renderPlayerItems(playersWithRatings)}</div>`;
+  document.body.appendChild(modal); 
+  modal.classList.add('active');
+  
+  // Add search functionality
+  const searchInput = content.querySelector('.modal-search-input');
+  const playerList = content.querySelector('.modal-player-list');
+  
+  if (searchInput) {
+    searchInput.addEventListener('input', (e) => {
+      const searchTerm = e.target.value.toLowerCase().trim();
+      const playerItems = playerList.querySelectorAll('.modal-player-item');
+      
+      playerItems.forEach(item => {
+        const playerName = item.dataset.playerName || '';
+        if (playerName.includes(searchTerm)) {
+          item.style.display = '';
+        } else {
+          item.style.display = 'none';
+        }
+      });
+    });
+    
+    // Focus the search input for better UX
+    setTimeout(() => searchInput.focus(), 100);
+  }
 }
 
 // Swap logic

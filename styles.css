@@ -737,6 +737,24 @@ input[type="number"].attr-value-15-20 {
     color: var(--text-secondary);
 }
 
+.modal-search-container {
+    margin-bottom: 15px;
+}
+
+.modal-search-input {
+    width: 100%;
+    padding: 10px 15px;
+    border: 2px solid var(--border-color);
+    border-radius: 5px;
+    font-size: 1em;
+    transition: border-color 0.3s ease;
+}
+
+.modal-search-input:focus {
+    outline: none;
+    border-color: var(--accent-color);
+}
+
 .modal-player-list {
     display: flex;
     flex-direction: column;
