@@ -23,6 +23,9 @@ export function setupEventListeners() {
   const formationSelect = document.getElementById('formation');
   formationSelect?.addEventListener('change', (e) => { state.currentFormation = e.target.value; saveData(); renderLineup(); });
 
+  // Clear lineup button
+  document.getElementById('clear-lineup-btn')?.addEventListener('click', clearLineup);
+
   // Search & filter
   document.getElementById('search-player')?.addEventListener('input', renderSquad);
   document.getElementById('position-filter')?.addEventListener('change', renderSquad);
@@ -214,14 +217,22 @@ function updateFormTitle() {
 function addToLineup(playerId) {
   const player = state.players.find(p => p.id === playerId); if (!player) return;
   const isCustom = state.currentFormation === 'Custom';
+  const formationDef = formations[state.currentFormation];
   
   // Check if lineup is already full (11 players for custom formation)
-  if (isCustom && state.lineup.length >= 11) {
-    alert('Custom formation can only have 11 players maximum.');
-    return;
+  // Count only players in selectable slots
+  if (isCustom) {
+    const selectablePlayerCount = state.lineup.filter(assignment => {
+      const slot = formationDef[assignment.slotIndex];
+      return slot && slot.selectable !== false;
+    }).length;
+    
+    if (selectablePlayerCount >= 11) {
+      alert('Custom formation can only have 11 players maximum.');
+      return;
+    }
   }
   
-  const formationDef = formations[state.currentFormation];
   const available = formationDef.map((slot,i)=>({ ...slot, index:i }))
     .filter(slot => {
       // Filter out non-selectable slots in custom formation
@@ -237,15 +248,23 @@ function addToLineup(playerId) {
 
 function assignToSlot(playerId, slotIndex) {
   const isCustom = state.currentFormation === 'Custom';
+  const formationDef = formations[state.currentFormation];
   
   // Check if lineup is already full (11 players for custom formation)
-  if (isCustom && state.lineup.length >= 11) {
-    alert('Custom formation can only have 11 players maximum.');
-    closeModal();
-    return;
+  // Count only players in selectable slots
+  if (isCustom) {
+    const selectablePlayerCount = state.lineup.filter(assignment => {
+      const slot = formationDef[assignment.slotIndex];
+      return slot && slot.selectable !== false;
+    }).length;
+    
+    if (selectablePlayerCount >= 11) {
+      alert('Custom formation can only have 11 players maximum.');
+      closeModal();
+      return;
+    }
   }
   
-  const formationDef = formations[state.currentFormation];
   const position = formationDef[slotIndex].position;
   const roles = positionRoles[position] || [];
   if (!roles.length) { state.lineup.push({ slotIndex, playerId }); saveData(); renderLineup(); closeModal(); return; }
@@ -271,6 +290,16 @@ function removeFromLineup(slotIndex) {
   state.lineup = state.lineup.filter(l => l.slotIndex !== slotIndex); saveData(); renderLineup();
 }
 
+function clearLineup() {
+  if (state.lineup.length === 0) return;
+  if (!window.confirm('Remove all players from the lineup?')) return;
+  state.lineup = [];
+  state.swapMode = false;
+  state.firstSwapSlotIndex = null;
+  saveData();
+  renderLineup();
+}
+
 // Slot interactions
 function handleSlotClick(slotIndex, position) {
   if (state.swapMode) startSwapMode(slotIndex); else changeRole(slotIndex, position);
@@ -278,11 +307,20 @@ function handleSlotClick(slotIndex, position) {
 
 function selectPlayerForSlot(slotIndex, position) {
   const isCustom = state.currentFormation === 'Custom';
+  const formationDef = formations[state.currentFormation];
   
   // Check if lineup is already full (11 players for custom formation)
-  if (isCustom && state.lineup.length >= 11) {
-    alert('Custom formation can only have 11 players maximum.');
-    return;
+  // Count only players in selectable slots
+  if (isCustom) {
+    const selectablePlayerCount = state.lineup.filter(assignment => {
+      const slot = formationDef[assignment.slotIndex];
+      return slot && slot.selectable !== false;
+    }).length;
+    
+    if (selectablePlayerCount >= 11) {
+      alert('Custom formation can only have 11 players maximum.');
+      return;
+    }
   }
   
   const available = state.players.filter(p => getPlayerPositions(p).includes(position) && !state.lineup.find(l => l.playerId === p.id));

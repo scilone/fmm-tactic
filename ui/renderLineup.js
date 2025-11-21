@@ -9,18 +9,31 @@ export function renderLineup() {
   const formationDef = formations[state.currentFormation];
   const isCustom = state.currentFormation === 'Custom';
   
-  // Check if we have more than 11 players selected in custom formation
-  if (isCustom && state.lineup.length > 11) {
-    // Remove excess players (keep first 11)
-    const removed = state.lineup.length - 11;
-    state.lineup = state.lineup.slice(0, 11);
-    console.warn(`Custom formation limited to 11 players. Removed ${removed} player(s).`);
+  // For custom formation, remove players in non-selectable slots and enforce 11-player limit
+  if (isCustom) {
+    const validLineup = state.lineup.filter(assignment => {
+      const slot = formationDef[assignment.slotIndex];
+      return slot && slot.selectable !== false;
+    });
+    
+    if (validLineup.length > 11) {
+      // Remove excess players (keep first 11)
+      const removed = validLineup.length - 11;
+      state.lineup = validLineup.slice(0, 11);
+      console.warn(`Custom formation limited to 11 players. Removed ${removed} player(s).`);
+    } else if (validLineup.length !== state.lineup.length) {
+      // Some players were in non-selectable slots
+      state.lineup = validLineup;
+      console.warn(`Removed players from non-selectable positions.`);
+    }
   }
 
   const rows = {};
   formationDef.forEach((slot, index) => { if (!rows[slot.row]) rows[slot.row] = []; rows[slot.row].push({ ...slot, index }); });
 
-  const rowsHTML = Object.keys(rows).sort((a,b)=>b-a).map(rowNum => {
+  // For Custom formation, sort rows in ascending order (GK at bottom), for others descending (GK at bottom too, but different row numbering)
+  const sortOrder = isCustom ? (a,b)=>a-b : (a,b)=>b-a;
+  const rowsHTML = Object.keys(rows).sort(sortOrder).map(rowNum => {
     const rowSlots = rows[rowNum];
     const slotsHTML = rowSlots.map(slot => {
       // Handle non-selectable slots for custom formation

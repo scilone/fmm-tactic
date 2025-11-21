@@ -247,6 +247,12 @@ header h1 {
     background: white;
 }
 
+.formation-selector button {
+    padding: 8px 15px;
+    font-size: 0.9em;
+    white-space: nowrap;
+}
+
 /* Average Rating */
 .average-rating {
     background: var(--card-bg);
