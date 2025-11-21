@@ -247,6 +247,12 @@ header h1 {
     background: white;
 }
 
+.formation-selector button {
+    padding: 8px 15px;
+    font-size: 0.9em;
+    white-space: nowrap;
+}
+
 /* Average Rating */
 .average-rating {
     background: var(--card-bg);
@@ -294,6 +300,14 @@ header h1 {
     padding: 10px 0;
 }
 
+.pitch-row-custom {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 10px;
+    padding: 5px 0;
+    justify-items: center;
+}
+
 .position-slot {
     background: rgba(255, 255, 255, 0.3);
     border: 2px dashed white;
@@ -313,6 +327,19 @@ header h1 {
 .position-slot.filled {
     background: white;
     border: 2px solid var(--accent-color);
+}
+
+.position-slot.non-selectable {
+    background: transparent;
+    border: none;
+    cursor: default;
+    min-width: 100px;
+    min-height: 80px;
+    opacity: 0.3;
+}
+
+.position-slot.non-selectable:hover {
+    background: transparent;
 }
 
 .position-label {

@@ -180,5 +180,43 @@ export const formations = {
     { label: 'AMR', position: 'AMR', row: 3 },
     { label: 'ST', position: 'ST', row: 4 },
     { label: 'ST', position: 'ST', row: 4 }
+  ],
+  'Custom': [
+    // Row 0 (Top - Strikers): . ST ST ST .
+    { label: '', position: null, row: 0, col: 0, selectable: false },
+    { label: 'ST', position: 'ST', row: 0, col: 1, selectable: true },
+    { label: 'ST', position: 'ST', row: 0, col: 2, selectable: true },
+    { label: 'ST', position: 'ST', row: 0, col: 3, selectable: true },
+    { label: '', position: null, row: 0, col: 4, selectable: false },
+    // Row 1: AML AMC AMC AMC AMR
+    { label: 'AML', position: 'AML', row: 1, col: 0, selectable: true },
+    { label: 'AMC', position: 'AMC', row: 1, col: 1, selectable: true },
+    { label: 'AMC', position: 'AMC', row: 1, col: 2, selectable: true },
+    { label: 'AMC', position: 'AMC', row: 1, col: 3, selectable: true },
+    { label: 'AMR', position: 'AMR', row: 1, col: 4, selectable: true },
+    // Row 2: ML MC MC MC MR
+    { label: 'ML', position: 'ML', row: 2, col: 0, selectable: true },
+    { label: 'MC', position: 'MC', row: 2, col: 1, selectable: true },
+    { label: 'MC', position: 'MC', row: 2, col: 2, selectable: true },
+    { label: 'MC', position: 'MC', row: 2, col: 3, selectable: true },
+    { label: 'MR', position: 'MR', row: 2, col: 4, selectable: true },
+    // Row 3: WBL DMC DMC DMC WBR
+    { label: 'WBL', position: 'WBL', row: 3, col: 0, selectable: true },
+    { label: 'DMC', position: 'DMC', row: 3, col: 1, selectable: true },
+    { label: 'DMC', position: 'DMC', row: 3, col: 2, selectable: true },
+    { label: 'DMC', position: 'DMC', row: 3, col: 3, selectable: true },
+    { label: 'WBR', position: 'WBR', row: 3, col: 4, selectable: true },
+    // Row 4: DL DC DC DC DR
+    { label: 'DL', position: 'DL', row: 4, col: 0, selectable: true },
+    { label: 'DC', position: 'DC', row: 4, col: 1, selectable: true },
+    { label: 'DC', position: 'DC', row: 4, col: 2, selectable: true },
+    { label: 'DC', position: 'DC', row: 4, col: 3, selectable: true },
+    { label: 'DR', position: 'DR', row: 4, col: 4, selectable: true },
+    // Row 5 (Bottom - Goalkeeper): . . GK . .
+    { label: '', position: null, row: 5, col: 0, selectable: false },
+    { label: '', position: null, row: 5, col: 1, selectable: false },
+    { label: 'GK', position: 'GK', row: 5, col: 2, selectable: true },
+    { label: '', position: null, row: 5, col: 3, selectable: false },
+    { label: '', position: null, row: 5, col: 4, selectable: false }
   ]
 };

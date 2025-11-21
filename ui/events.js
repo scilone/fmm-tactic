@@ -23,6 +23,9 @@ export function setupEventListeners() {
   const formationSelect = document.getElementById('formation');
   formationSelect?.addEventListener('change', (e) => { state.currentFormation = e.target.value; saveData(); renderLineup(); });
 
+  // Clear lineup button
+  document.getElementById('clear-lineup-btn')?.addEventListener('click', clearLineup);
+
   // Search & filter
   document.getElementById('search-player')?.addEventListener('input', renderSquad);
   document.getElementById('position-filter')?.addEventListener('change', renderSquad);
@@ -77,6 +80,10 @@ export function setupEventListeners() {
   document.getElementById('pitch')?.addEventListener('click', e => {
     const slot = e.target.closest('.position-slot');
     if (!slot) return;
+    
+    // Ignore clicks on non-selectable slots
+    if (slot.classList.contains('non-selectable')) return;
+    
     const slotIndex = parseInt(slot.dataset.slotIndex);
     const position = slot.dataset.position;
     const removeBtn = e.target.closest('[data-action="remove-slot"]');
@@ -109,6 +116,10 @@ export function setupEventListeners() {
     pitch.addEventListener('drop', e => {
       const targetSlot = e.target.closest('.position-slot');
       if (!targetSlot) return;
+      
+      // Ignore drops on non-selectable slots
+      if (targetSlot.classList.contains('non-selectable')) return;
+      
       const targetSlotIndex = parseInt(targetSlot.dataset.slotIndex);
       if (state.draggedSlotIndex !== null && state.draggedSlotIndex !== targetSlotIndex) {
         const assignment = state.lineup.find(l => l.slotIndex === targetSlotIndex);
@@ -205,15 +216,55 @@ function updateFormTitle() {
 // Lineup operations
 function addToLineup(playerId) {
   const player = state.players.find(p => p.id === playerId); if (!player) return;
+  const isCustom = state.currentFormation === 'Custom';
   const formationDef = formations[state.currentFormation];
-  const available = formationDef.map((slot,i)=>({ ...slot, index:i })).filter(slot => !state.lineup.find(l => l.slotIndex === slot.index) && getPlayerPositions(player).includes(slot.position));
+  
+  // Check if lineup is already full (11 players for custom formation)
+  // Count only players in selectable slots
+  if (isCustom) {
+    const selectablePlayerCount = state.lineup.filter(assignment => {
+      const slot = formationDef[assignment.slotIndex];
+      return slot && slot.selectable !== false;
+    }).length;
+    
+    if (selectablePlayerCount >= 11) {
+      alert('Custom formation can only have 11 players maximum.');
+      return;
+    }
+  }
+  
+  const available = formationDef.map((slot,i)=>({ ...slot, index:i }))
+    .filter(slot => {
+      // Filter out non-selectable slots in custom formation
+      if (isCustom && slot.selectable === false) return false;
+      // Filter out slots without a valid position
+      if (!slot.position) return false;
+      return !state.lineup.find(l => l.slotIndex === slot.index) && getPlayerPositions(player).includes(slot.position);
+    });
   if (!available.length) { alert('No available position for player'); return; }
   if (available.length === 1) { state.lineup.push({ slotIndex: available[0].index, playerId }); saveData(); renderLineup(); return; }
   showPositionModal(player, available);
 }
 
 function assignToSlot(playerId, slotIndex) {
+  const isCustom = state.currentFormation === 'Custom';
   const formationDef = formations[state.currentFormation];
+  
+  // Check if lineup is already full (11 players for custom formation)
+  // Count only players in selectable slots
+  if (isCustom) {
+    const selectablePlayerCount = state.lineup.filter(assignment => {
+      const slot = formationDef[assignment.slotIndex];
+      return slot && slot.selectable !== false;
+    }).length;
+    
+    if (selectablePlayerCount >= 11) {
+      alert('Custom formation can only have 11 players maximum.');
+      closeModal();
+      return;
+    }
+  }
+  
   const position = formationDef[slotIndex].position;
   const roles = positionRoles[position] || [];
   if (!roles.length) { state.lineup.push({ slotIndex, playerId }); saveData(); renderLineup(); closeModal(); return; }
@@ -239,12 +290,39 @@ function removeFromLineup(slotIndex) {
   state.lineup = state.lineup.filter(l => l.slotIndex !== slotIndex); saveData(); renderLineup();
 }
 
+function clearLineup() {
+  if (state.lineup.length === 0) return;
+  if (!window.confirm('Remove all players from the lineup?')) return;
+  state.lineup = [];
+  state.swapMode = false;
+  state.firstSwapSlotIndex = null;
+  saveData();
+  renderLineup();
+}
+
 // Slot interactions
 function handleSlotClick(slotIndex, position) {
   if (state.swapMode) startSwapMode(slotIndex); else changeRole(slotIndex, position);
 }
 
 function selectPlayerForSlot(slotIndex, position) {
+  const isCustom = state.currentFormation === 'Custom';
+  const formationDef = formations[state.currentFormation];
+  
+  // Check if lineup is already full (11 players for custom formation)
+  // Count only players in selectable slots
+  if (isCustom) {
+    const selectablePlayerCount = state.lineup.filter(assignment => {
+      const slot = formationDef[assignment.slotIndex];
+      return slot && slot.selectable !== false;
+    }).length;
+    
+    if (selectablePlayerCount >= 11) {
+      alert('Custom formation can only have 11 players maximum.');
+      return;
+    }
+  }
+  
   const available = state.players.filter(p => getPlayerPositions(p).includes(position) && !state.lineup.find(l => l.playerId === p.id));
   if (!available.length) { alert(`No available ${position} players.`); return; }
   available.sort((a,b)=>parseFloat(calculateRating(b)) - parseFloat(calculateRating(a)));
@@ -274,6 +352,20 @@ function swapPlayers(a,b) {
   const can1 = getPlayerPositions(p1).includes(pos2); const can2 = getPlayerPositions(p2).includes(pos1);
   if (!can1 || !can2) { alert('Swap invalid: position incompatibility.'); return; }
   as1.slotIndex = b; as2.slotIndex = a; saveData(); renderLineup();
+}
+
+function movePlayerToEmptySlot(fromSlotIndex, toSlotIndex, targetPosition) {
+  const assignment = state.lineup.find(l => l.slotIndex === fromSlotIndex);
+  if (!assignment) return;
+  const player = state.players.find(p => p.id === assignment.playerId);
+  if (!player) return;
+  if (!getPlayerPositions(player).includes(targetPosition)) {
+    alert('Player cannot play in this position.');
+    return;
+  }
+  assignment.slotIndex = toSlotIndex;
+  saveData();
+  renderLineup();
 }
 
 // Drag & drop (simplified as potential future enhancement)
