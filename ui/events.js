@@ -579,12 +579,13 @@ function handlePlayerNameClick(slotIndex, position, currentRole) {
 }
 
 function replacePlayer(playerId, slotIndex, role) {
-  // Remove the existing player and add the new one
+  // Update the existing assignment with the new player, maintaining or updating the role
   const assignment = state.lineup.find(l => l.slotIndex === slotIndex);
   if (!assignment) return;
   
   assignment.playerId = playerId;
-  if (role) {
+  // Maintain the existing role if no new role is provided
+  if (role !== null && role !== undefined && role !== '') {
     assignment.role = role;
   }
   

@@ -131,7 +131,7 @@ export function showPlayerChangeModal(slotIndex, position, currentRole) {
   
   // Calculate ratings for the current role (or general rating if no role)
   const playersWithRatings = available.map(player => {
-    const rating = currentRole ? calculateRating(player, position, currentRole) : calculateRating(player, position);
+    const rating = currentRole ? calculateRating(player, position, currentRole) : calculateRating(player, position, null);
     const ratingValue = parseFloat(rating);
     const ratingClass = ratingValue >= 15 ? 'rating-excellent' : ratingValue >= 10 ? 'rating-good' : ratingValue >= 5 ? 'rating-average' : 'rating-poor';
     return {
