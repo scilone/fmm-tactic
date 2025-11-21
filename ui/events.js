@@ -158,6 +158,26 @@ export function setupEventListeners() {
       assignWithRole(playerId, slotIndex, role);
     }
 
+    // New action: select role first for empty slot
+    const selectRoleTarget = e.target.closest('[data-action="select-role-for-slot"]');
+    if (selectRoleTarget) {
+      const slotIndex = parseInt(selectRoleTarget.dataset.slot);
+      const position = selectRoleTarget.dataset.position;
+      const role = selectRoleTarget.dataset.role;
+      closeModal();
+      showPlayerListForSlot(slotIndex, position, role);
+    }
+
+    // New action: assign player with pre-selected role
+    const assignPlayerWithRoleTarget = e.target.closest('[data-action="assign-player-with-role"]');
+    if (assignPlayerWithRoleTarget) {
+      const playerId = parseInt(assignPlayerWithRoleTarget.dataset.player);
+      const slotIndex = parseInt(assignPlayerWithRoleTarget.dataset.slot);
+      const roleData = assignPlayerWithRoleTarget.dataset.role;
+      const role = (roleData && roleData.trim() !== '') ? roleData : null;
+      assignPlayerToLineup(playerId, slotIndex, role);
+    }
+
     const playerModal = document.getElementById('player-details-modal');
     if (playerModal && e.target === playerModal) closePlayerDetailsModal();
   });
@@ -267,12 +287,22 @@ function assignToSlot(playerId, slotIndex) {
   
   const position = formationDef[slotIndex].position;
   const roles = positionRoles[position] || [];
-  if (!roles.length) { state.lineup.push({ slotIndex, playerId }); saveData(); renderLineup(); closeModal(); return; }
+  if (!roles.length) { assignPlayerToLineup(playerId, slotIndex); return; }
   showRoleSelectionModal(playerId, slotIndex, position, roles);
 }
 
 function assignWithRole(playerId, slotIndex, role) {
-  state.lineup.push({ slotIndex, playerId, role }); saveData(); renderLineup(); closeModal();
+  assignPlayerToLineup(playerId, slotIndex, role);
+}
+
+// Helper function to reduce code duplication
+function assignPlayerToLineup(playerId, slotIndex, role = null) {
+  const assignment = { slotIndex, playerId };
+  if (role) assignment.role = role;
+  state.lineup.push(assignment);
+  saveData();
+  renderLineup();
+  closeModal();
 }
 
 function changeRole(slotIndex, position) {
@@ -323,13 +353,58 @@ function selectPlayerForSlot(slotIndex, position) {
     }
   }
   
-  const available = state.players.filter(p => getPlayerPositions(p).includes(position) && !state.lineup.find(l => l.playerId === p.id));
-  if (!available.length) { alert(`No available ${position} players.`); return; }
-  available.sort((a,b)=>parseFloat(calculateRating(b)) - parseFloat(calculateRating(a)));
+  // NEW FLOW: First select role, then select player with role-specific rating
+  const roles = positionRoles[position] || [];
+  
+  // If there are no roles for this position, show players directly
+  if (!roles.length) {
+    showPlayerListForSlot(slotIndex, position, null);
+    return;
+  }
+  
+  // Show role selection first
+  showRoleSelectionForSlot(slotIndex, position, roles);
+}
+
+// New function to show role selection first
+function showRoleSelectionForSlot(slotIndex, position, roles) {
   const modal = createModal();
   const content = modal.querySelector('.modal-content');
-  content.innerHTML = `<div class="modal-header"><h3>Select ${position} Player</h3><button class="modal-close" data-action="close-modal">×</button></div>
-    <div class="modal-player-list">${available.map(player => `<div class="modal-player-item" data-action="assign-slot" data-player="${player.id}" data-slot="${slotIndex}"><div class="modal-player-name">${player.name}</div><div class="modal-player-info"><span>${getPlayerPositions(player).join(', ')}</span><span>Rating: ${calculateRating(player)}</span></div></div>`).join('')}</div>`;
+  content.innerHTML = `<div class="modal-header"><h3>Select Role for ${position}</h3><button class="modal-close" data-action="close-modal">×</button></div>
+    <div class="modal-player-list">${roles.map(role => `<div class="modal-player-item" data-action="select-role-for-slot" data-slot="${slotIndex}" data-position="${position}" data-role="${role}"><div class="modal-player-name">${role}</div></div>`).join('')}</div>`;
+  document.body.appendChild(modal); modal.classList.add('active');
+}
+
+// New function to show player list with role-specific rating
+function showPlayerListForSlot(slotIndex, position, role) {
+  const available = state.players.filter(p => getPlayerPositions(p).includes(position) && !state.lineup.find(l => l.playerId === p.id));
+  if (!available.length) { 
+    alert(`No available ${position} players.`); 
+    return; 
+  }
+  
+  // Calculate ratings once and store with player data for efficiency
+  const playersWithRatings = available.map(player => {
+    const rating = role ? calculateRating(player, position, role) : calculateRating(player);
+    return {
+      player,
+      rating,
+      ratingValue: parseFloat(rating)
+    };
+  });
+  
+  // Sort by rating value
+  playersWithRatings.sort((a, b) => b.ratingValue - a.ratingValue);
+  
+  const modal = createModal();
+  const content = modal.querySelector('.modal-content');
+  const roleText = role ? ` - ${role}` : '';
+  const playerItems = playersWithRatings.map(({ player, rating }) => {
+    return `<div class="modal-player-item" data-action="assign-player-with-role" data-player="${player.id}" data-slot="${slotIndex}" data-role="${role || ''}"><div class="modal-player-name">${player.name}</div><div class="modal-player-info"><span>${getPlayerPositions(player).join(', ')}</span><span>Rating: ${rating}</span></div></div>`;
+  }).join('');
+  
+  content.innerHTML = `<div class="modal-header"><h3>Select ${position} Player${roleText}</h3><button class="modal-close" data-action="close-modal">×</button></div>
+    <div class="modal-player-list">${playerItems}</div>`;
   document.body.appendChild(modal); modal.classList.add('active');
 }
 
@@ -430,4 +505,4 @@ function updateAttributeColor() {
 }
 
 // Expose functions for window binding in main.js
-export const exposed = { assignToSlot, assignWithRole, updateRole, removeFromLineup, addToLineup, editPlayer, deletePlayer, selectPlayerForSlot, handleSlotClick, viewPlayerDetails, startSwapMode, changeRole, toggleGKAttributes, closePlayerDetailsModal };
+export const exposed = { assignToSlot, assignWithRole, updateRole, removeFromLineup, addToLineup, editPlayer, deletePlayer, selectPlayerForSlot, handleSlotClick, viewPlayerDetails, startSwapMode, changeRole, toggleGKAttributes, closePlayerDetailsModal, showPlayerListForSlot, showRoleSelectionForSlot };
