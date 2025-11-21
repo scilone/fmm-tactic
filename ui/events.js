@@ -6,7 +6,7 @@ import { renderLineup } from './renderLineup.js';
 import { calculateRating } from '../services/rating.js';
 import { saveData } from '../services/storage.js';
 import { exportData, importDataFile } from '../services/importExport.js';
-import { showPositionModal, showRoleSelectionModal, viewPlayerDetails, closeModal, closePlayerDetailsModal } from './modals.js';
+import { createModal, showPositionModal, showRoleSelectionModal, viewPlayerDetails, closeModal, closePlayerDetailsModal } from './modals.js';
 
 export function setupEventListeners() {
   // Tab buttons
@@ -75,8 +75,45 @@ export function setupEventListeners() {
     }
   });
 
+  // Drag and drop for pitch
+  const pitch = document.getElementById('pitch');
+  if (pitch) {
+    pitch.addEventListener('dragstart', e => {
+      const slot = e.target.closest('.position-slot');
+      if (slot && slot.draggable) {
+        state.draggedSlotIndex = parseInt(slot.dataset.slotIndex);
+        e.dataTransfer.effectAllowed = 'move';
+        slot.classList.add('dragging');
+      }
+    });
+    pitch.addEventListener('dragover', e => {
+      e.preventDefault();
+      e.dataTransfer.dropEffect = 'move';
+    });
+    pitch.addEventListener('drop', e => {
+      const targetSlot = e.target.closest('.position-slot');
+      if (!targetSlot) return;
+      const targetSlotIndex = parseInt(targetSlot.dataset.slotIndex);
+      if (state.draggedSlotIndex !== null && state.draggedSlotIndex !== targetSlotIndex) {
+        const assignment = state.lineup.find(l => l.slotIndex === targetSlotIndex);
+        if (assignment) {
+          swapPlayers(state.draggedSlotIndex, targetSlotIndex);
+        } else {
+          const targetPosition = targetSlot.dataset.position;
+          movePlayerToEmptySlot(state.draggedSlotIndex, targetSlotIndex, targetPosition);
+        }
+      }
+    });
+    pitch.addEventListener('dragend', e => {
+      const slot = e.target.closest('.position-slot');
+      if (slot) slot.classList.remove('dragging');
+      state.draggedSlotIndex = null;
+    });
+  }
+
   document.addEventListener('click', e => {
     if (e.target?.dataset?.action === 'close-modal') closeModal();
+    if (e.target?.dataset?.action === 'close-player-modal') closePlayerDetailsModal();
     
     // Modal actions
     const assignSlotTarget = e.target.closest('[data-action="assign-slot"]');
@@ -195,9 +232,11 @@ function selectPlayerForSlot(slotIndex, position) {
   const available = state.players.filter(p => getPlayerPositions(p).includes(position) && !state.lineup.find(l => l.playerId === p.id));
   if (!available.length) { alert(`No available ${position} players.`); return; }
   available.sort((a,b)=>parseFloat(calculateRating(b)) - parseFloat(calculateRating(a)));
-  const player = { id: 'select', name: position }; // placeholder for modal title
-  const slots = [{ index: slotIndex, label: position }];
-  showPositionModal(player, slots);
+  const modal = createModal();
+  const content = modal.querySelector('.modal-content');
+  content.innerHTML = `<div class="modal-header"><h3>Select ${position} Player</h3><button class="modal-close" data-action="close-modal">×</button></div>
+    <div class="modal-player-list">${available.map(player => `<div class="modal-player-item" data-action="assign-slot" data-player="${player.id}" data-slot="${slotIndex}"><div class="modal-player-name">${player.name}</div><div class="modal-player-info"><span>${getPlayerPositions(player).join(', ')}</span><span>Rating: ${calculateRating(player)}</span></div></div>`).join('')}</div>`;
+  document.body.appendChild(modal); modal.classList.add('active');
 }
 
 // Swap logic

@@ -52,10 +52,12 @@ export function viewPlayerDetails(playerId) {
     detailsHTML += `<div class="position-section"><div class="position-header">${position}</div><div class="roles-grid">`;
     roles.forEach(role => {
       const rating = calculateRating(player, position, role);
-      detailsHTML += `<div class="role-card"><div class="role-name">${role}</div><div class="role-rating"><span class="rating-badge">${rating}</span></div></div>`;
+      const ratingClass = rating >= 15 ? 'rating-excellent' : rating >= 10 ? 'rating-good' : rating >= 5 ? 'rating-average' : 'rating-poor';
+      detailsHTML += `<div class="role-card"><div class="role-name">${role}</div><div class="role-rating"><span class="rating-badge ${ratingClass}">${rating}</span></div></div>`;
     });
     detailsHTML += `</div></div>`;
   });
+  if (!detailsHTML) detailsHTML = '<p>No position data available for this player.</p>';
   modalDetails.innerHTML = detailsHTML;
   modal.classList.add('active');
 }
