@@ -1032,9 +1032,9 @@ input[type="number"].attr-value-15-20 {
     }
 
     .position-slot {
-        min-width: 50px;
+        min-width: 52px;
         max-width: 65px;
-        min-height: 48px;
+        min-height: 50px;
         padding: 3px;
         font-size: 0.7em;
         border-radius: 5px;
