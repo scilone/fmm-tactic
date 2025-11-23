@@ -22,6 +22,10 @@
     /* Touch-friendly minimum sizes */
     --min-touch-target: 44px;
     --button-height: 44px;
+    
+    /* Animation values for consistency */
+    --active-scale: 0.98;
+    --hover-scale: 1.05;
 }
 
 * {
@@ -248,7 +252,7 @@ header h1 {
 }
 
 .btn:active {
-    transform: scale(0.98);
+    transform: scale(var(--active-scale));
 }
 
 .btn-primary {
@@ -355,15 +359,20 @@ header h1 {
     min-height: 600px;
     position: relative;
     box-shadow: 0 4px 12px var(--shadow);
-    /* Add subtle texture for better visual appeal */
-    background-image: 
-        repeating-linear-gradient(
-            0deg,
-            transparent,
-            transparent 45px,
-            rgba(255, 255, 255, 0.03) 45px,
-            rgba(255, 255, 255, 0.03) 50px
-        );
+}
+
+/* Add subtle texture for better visual appeal on larger screens only */
+@media (min-width: 768px) {
+    .pitch {
+        background-image: 
+            repeating-linear-gradient(
+                0deg,
+                transparent,
+                transparent 45px,
+                rgba(255, 255, 255, 0.03) 45px,
+                rgba(255, 255, 255, 0.03) 50px
+            );
+    }
 }
 
 .pitch-positions {
@@ -659,12 +668,12 @@ header h1 {
 .position-option:hover {
     background: white;
     border-color: var(--accent-color);
-    transform: scale(1.05);
+    transform: scale(var(--hover-scale));
     box-shadow: 0 2px 8px rgba(76, 175, 80, 0.2);
 }
 
 .position-option:active {
-    transform: scale(1.02);
+    transform: scale(var(--active-scale));
 }
 
 .position-option input[type="radio"],
@@ -1131,11 +1140,11 @@ input[type="number"].attr-value-15-20 {
 @keyframes modalSlideIn {
     from {
         opacity: 0;
-        transform: translateY(-20px) scale(0.95);
+        transform: translate3d(0, -20px, 0) scale(0.95);
     }
     to {
         opacity: 1;
-        transform: translateY(0) scale(1);
+        transform: translate3d(0, 0, 0) scale(1);
     }
 }
 
@@ -1179,7 +1188,7 @@ input[type="number"].attr-value-15-20 {
 }
 
 .close-modal:active {
-    transform: scale(0.95);
+    transform: scale(var(--active-scale));
 }
 
 .modal-body {
