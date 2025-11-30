@@ -1,6 +1,7 @@
 import { getCurrentLanguage, setLanguage, t, translateAttribute, translatePosition, translatePositionName } from '../config/i18n.js';
 import { renderSquad } from './renderSquad.js';
 import { renderLineup } from './renderLineup.js';
+import { state } from '../models/state.js';
 
 // Update all UI elements with translations
 export function updateUILanguage() {
@@ -93,10 +94,12 @@ function updatePositionFilter() {
 
 // Update player form labels
 function updatePlayerFormLabels() {
+  // Determine if we're in edit mode using state
+  const isEditing = state.editingPlayerId !== null;
+  
   // Form title
   const formTitle = document.querySelector('#add-player .section-header h2');
   if (formTitle) {
-    const isEditing = formTitle.textContent.includes('Edit');
     formTitle.textContent = isEditing ? t('playerForm.editTitle') : t('playerForm.title');
   }
   
@@ -130,7 +133,6 @@ function updatePlayerFormLabels() {
   // Form buttons
   const submitBtn = document.querySelector('#player-form button[type="submit"]');
   if (submitBtn) {
-    const isEditing = submitBtn.textContent.includes('Update');
     submitBtn.textContent = isEditing ? t('playerForm.updatePlayer') : t('playerForm.addPlayer');
   }
   
