@@ -2,6 +2,7 @@ import { state } from '../models/state.js';
 import { formations } from '../config/formations.js';
 import { calculateRating } from '../services/rating.js';
 import { updateTeamAverage } from './teamAverage.js';
+import { t, translatePosition, translateRole } from '../config/i18n.js';
 
 export function renderLineup() {
   const pitch = document.getElementById('pitch');
@@ -45,21 +46,23 @@ export function renderLineup() {
       
       const assignment = state.lineup.find(l => l.slotIndex === slot.index);
       const player = assignment ? state.players.find(p => p.id === assignment.playerId) : null;
+      const translatedLabel = translatePosition(slot.label);
       if (player) {
         const role = assignment.role || '';
-        const roleDisplay = role ? `<div class="position-role" data-action="change-role" data-slot="${slot.index}" data-position="${slot.position}" data-player="${player.id}" title="Click to change role">${role}</div>` : '';
+        const translatedRole = role ? translateRole(role) : '';
+        const roleDisplay = role ? `<div class="position-role" data-action="change-role" data-slot="${slot.index}" data-position="${slot.position}" data-player="${player.id}" title="${t('modals.clickToChangeRole')}">${translatedRole}</div>` : '';
         const rating = calculateRating(player, slot.position, role);
         return `<div class="position-slot filled" draggable="true" data-slot-index="${slot.index}" data-position="${slot.position}">
-          <div class="position-label">${slot.label}</div>
-          <div class="position-player" data-action="change-player" data-slot="${slot.index}" data-position="${slot.position}" data-current-role="${role}" title="Click to change player">${player.name}</div>
+          <div class="position-label">${translatedLabel}</div>
+          <div class="position-player" data-action="change-player" data-slot="${slot.index}" data-position="${slot.position}" data-current-role="${role}" title="${t('modals.clickToChangePlayer')}">${player.name}</div>
           ${roleDisplay}
           <div class="position-rating">${rating}</div>
-          <button class="position-remove" data-action="remove-slot" data-slot="${slot.index}">Remove</button>
-          <button class="position-swap" data-action="swap-slot" data-slot="${slot.index}">↔️ Swap</button>
+          <button class="position-remove" data-action="remove-slot" data-slot="${slot.index}">${t('lineupSection.remove')}</button>
+          <button class="position-swap" data-action="swap-slot" data-slot="${slot.index}">↔️ ${t('lineupSection.swap')}</button>
         </div>`;
       }
       return `<div class="position-slot" data-slot-index="${slot.index}" data-position="${slot.position}">
-        <div class="position-label">${slot.label}</div>
+        <div class="position-label">${translatedLabel}</div>
         <div style="color: white; margin-top: 10px;">+</div>
       </div>`;
     }).join('');
