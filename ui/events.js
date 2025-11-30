@@ -46,6 +46,9 @@ export function setupEventListeners() {
     e.target.value=''; 
   });
 
+  // JSON player import (single player via textarea)
+  document.getElementById('import-json-btn')?.addEventListener('click', handleImportJsonPlayer);
+
   // Attribute color coding and GK toggle
   setupAttributeColorCoding();
   document.querySelectorAll('input[name="position"]').forEach(input => {
@@ -269,6 +272,88 @@ function updateFormTitle() {
   if (!h2 || !btn) return;
   if (state.editingPlayerId) { h2.textContent = t('playerForm.editTitle'); btn.textContent = t('playerForm.updatePlayer'); }
   else { h2.textContent = t('playerForm.title'); btn.textContent = t('playerForm.addPlayer'); }
+}
+
+// Import single player from JSON and pre-fill the form
+function handleImportJsonPlayer() {
+  const textarea = document.getElementById('import-json-textarea');
+  const messageDiv = document.getElementById('import-message');
+  
+  if (!textarea || !textarea.value.trim()) {
+    showImportMessage(messageDiv, t('playerForm.jsonEmpty'), 'error');
+    return;
+  }
+  
+  try {
+    const data = JSON.parse(textarea.value);
+    
+    // Validate required fields
+    if (!data.name || typeof data.name !== 'string') {
+      showImportMessage(messageDiv, t('playerForm.jsonMissingName'), 'error');
+      return;
+    }
+    if (!data.positions || !Array.isArray(data.positions) || data.positions.length === 0) {
+      showImportMessage(messageDiv, t('playerForm.jsonMissingPositions'), 'error');
+      return;
+    }
+    if (!data.attributes || typeof data.attributes !== 'object') {
+      showImportMessage(messageDiv, t('playerForm.jsonMissingAttributes'), 'error');
+      return;
+    }
+    
+    // Pre-fill the form
+    document.getElementById('player-name').value = data.name;
+    
+    // Clear all position checkboxes first, then check the matching ones
+    document.querySelectorAll('input[name="position"]').forEach(input => {
+      input.checked = data.positions.includes(input.value);
+    });
+    
+    // Fill in standard attributes (case-insensitive)
+    const standardAttrs = ['aerial','crossing','dribbling','passing','shooting','tackling','technique','creativity','decisions','movement','aggression','positioning','teamwork','pace','stamina','strength','leadership'];
+    const attrMap = {};
+    Object.keys(data.attributes).forEach(key => {
+      attrMap[key.toLowerCase()] = data.attributes[key];
+    });
+    
+    standardAttrs.forEach(attr => {
+      const el = document.getElementById(`attr-${attr}`);
+      if (el && attrMap[attr] !== undefined) {
+        el.value = attrMap[attr];
+        updateAttributeColor.call(el);
+      }
+    });
+    
+    // Fill GK attributes if player is a goalkeeper
+    if (data.positions.includes('GK')) {
+      const gkAttrs = ['agility','handling','kicking','reflexes','throwing'];
+      gkAttrs.forEach(attr => {
+        const el = document.getElementById(`attr-${attr}`);
+        if (el && attrMap[attr] !== undefined) {
+          el.value = attrMap[attr];
+          updateAttributeColor.call(el);
+        }
+      });
+    }
+    
+    // Show/hide GK attributes section based on position
+    toggleGKAttributes();
+    
+    // Clear textarea and show success message
+    textarea.value = '';
+    showImportMessage(messageDiv, t('playerForm.jsonSuccess', { name: data.name }), 'success');
+    
+  } catch (e) {
+    console.error('JSON parse error:', e);
+    showImportMessage(messageDiv, t('playerForm.jsonParseError'), 'error');
+  }
+}
+
+function showImportMessage(div, message, type) {
+  if (!div) return;
+  div.textContent = message;
+  div.className = `import-message ${type}`;
+  setTimeout(() => { div.textContent = ''; div.className = 'import-message'; }, 5000);
 }
 
 // Lineup operations

@@ -53,7 +53,13 @@ export const translations = {
       pasteJson: 'Paste JSON here:',
       importFromJson: 'Import from JSON',
       selectPosition: 'Please select at least one position',
-      jsonPlaceholder: 'Paste your player JSON data here...'
+      jsonPlaceholder: 'Paste your player JSON data here...',
+      jsonEmpty: 'Please paste JSON data in the textarea',
+      jsonMissingName: 'Invalid JSON: missing "name" field',
+      jsonMissingPositions: 'Invalid JSON: missing or empty "positions" array',
+      jsonMissingAttributes: 'Invalid JSON: missing "attributes" object',
+      jsonParseError: 'Invalid JSON format. Please check your JSON syntax.',
+      jsonSuccess: 'Player "{name}" imported successfully! Review and click Add Player to save.'
     },
     modals: {
       selectPositionFor: 'Select Position for {name}',
@@ -229,7 +235,13 @@ export const translations = {
       pasteJson: 'Collez le JSON ici :',
       importFromJson: 'Importer depuis JSON',
       selectPosition: 'Veuillez sélectionner au moins une position',
-      jsonPlaceholder: 'Collez les données JSON du joueur ici...'
+      jsonPlaceholder: 'Collez les données JSON du joueur ici...',
+      jsonEmpty: 'Veuillez coller les données JSON dans la zone de texte',
+      jsonMissingName: 'JSON invalide : champ "name" manquant',
+      jsonMissingPositions: 'JSON invalide : tableau "positions" manquant ou vide',
+      jsonMissingAttributes: 'JSON invalide : objet "attributes" manquant',
+      jsonParseError: 'Format JSON invalide. Vérifiez la syntaxe du JSON.',
+      jsonSuccess: 'Joueur "{name}" importé avec succès ! Vérifiez et cliquez sur Ajouter Joueur pour enregistrer.'
     },
     modals: {
       selectPositionFor: 'Sélectionner Position pour {name}',
