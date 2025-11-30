@@ -111,6 +111,17 @@ function updatePlayerFormLabels() {
   const positionLabel = document.querySelector('label[for="player-position"]');
   if (positionLabel) positionLabel.textContent = `${t('playerForm.position')} *`;
   
+  // Position grid checkboxes
+  const positionOptions = document.querySelectorAll('.position-option');
+  positionOptions.forEach(option => {
+    const input = option.querySelector('input[name="position"]');
+    const span = option.querySelector('span');
+    if (input && span) {
+      const positionCode = input.value;
+      span.textContent = translatePosition(positionCode);
+    }
+  });
+  
   // Attribute section headers (using data-i18n attribute)
   const attrHeaders = document.querySelectorAll('#player-form h3[data-i18n]');
   attrHeaders.forEach(h3 => {
