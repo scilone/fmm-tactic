@@ -7,8 +7,13 @@ import { calculateRating } from '../services/rating.js';
 import { saveData } from '../services/storage.js';
 import { exportData, importDataFile } from '../services/importExport.js';
 import { createModal, showPositionModal, showRoleSelectionModal, viewPlayerDetails, closeModal, closePlayerDetailsModal, showRoleChangeModal, showPlayerChangeModal } from './modals.js';
+import { setupLanguageSwitcher, updateUILanguage } from './languageSwitcher.js';
+import { t, translateRole, translatePosition } from '../config/i18n.js';
 
 export function setupEventListeners() {
+  // Language switcher
+  setupLanguageSwitcher();
+  
   // Tab buttons
   document.querySelectorAll('.tab-btn').forEach(btn => {
     btn.addEventListener('click', () => switchTab(btn.dataset.tab));
@@ -225,7 +230,7 @@ function switchTab(name) {
 function handleAddPlayer(e) {
   e.preventDefault();
   const selected = Array.from(document.querySelectorAll('input[name="position"]:checked')).map(i => i.value);
-  if (!selected.length) { alert('Please select at least one position'); return; }
+  if (!selected.length) { alert(t('playerForm.selectPosition')); return; }
   const player = {
     id: state.editingPlayerId || Date.now(),
     name: document.getElementById('player-name').value,
@@ -262,8 +267,8 @@ function updateFormTitle() {
   const h2 = document.querySelector('#add-player .section-header h2');
   const btn = document.querySelector('#player-form button[type="submit"]');
   if (!h2 || !btn) return;
-  if (state.editingPlayerId) { h2.textContent='Edit Player'; btn.textContent='Update Player'; }
-  else { h2.textContent='Add New Player'; btn.textContent='Add Player'; }
+  if (state.editingPlayerId) { h2.textContent = t('playerForm.editTitle'); btn.textContent = t('playerForm.updatePlayer'); }
+  else { h2.textContent = t('playerForm.title'); btn.textContent = t('playerForm.addPlayer'); }
 }
 
 // Lineup operations
@@ -281,7 +286,7 @@ function addToLineup(playerId) {
     }).length;
     
     if (selectablePlayerCount >= 11) {
-      alert('Custom formation can only have 11 players maximum.');
+      alert(t('lineupSection.maxPlayersReached'));
       return;
     }
   }
@@ -294,7 +299,7 @@ function addToLineup(playerId) {
       if (!slot.position) return false;
       return !state.lineup.find(l => l.slotIndex === slot.index) && getPlayerPositions(player).includes(slot.position);
     });
-  if (!available.length) { alert('No available position for player'); return; }
+  if (!available.length) { alert(t('lineupSection.noAvailablePosition')); return; }
   if (available.length === 1) { state.lineup.push({ slotIndex: available[0].index, playerId }); saveData(); renderLineup(); return; }
   showPositionModal(player, available);
 }
@@ -312,7 +317,7 @@ function assignToSlot(playerId, slotIndex) {
     }).length;
     
     if (selectablePlayerCount >= 11) {
-      alert('Custom formation can only have 11 players maximum.');
+      alert(t('lineupSection.maxPlayersReached'));
       closeModal();
       return;
     }
@@ -355,7 +360,7 @@ function removeFromLineup(slotIndex) {
 
 function clearLineup() {
   if (state.lineup.length === 0) return;
-  if (!window.confirm('Remove all players from the lineup?')) return;
+  if (!window.confirm(t('lineupSection.clearConfirm'))) return;
   state.lineup = [];
   state.swapMode = false;
   state.firstSwapSlotIndex = null;
@@ -381,7 +386,7 @@ function selectPlayerForSlot(slotIndex, position) {
     }).length;
     
     if (selectablePlayerCount >= 11) {
-      alert('Custom formation can only have 11 players maximum.');
+      alert(t('lineupSection.maxPlayersReached'));
       return;
     }
   }
@@ -403,16 +408,18 @@ function selectPlayerForSlot(slotIndex, position) {
 function showRoleSelectionForSlot(slotIndex, position, roles) {
   const modal = createModal();
   const content = modal.querySelector('.modal-content');
-  content.innerHTML = `<div class="modal-header"><h3>Select Role for ${position}</h3><button class="modal-close" data-action="close-modal">×</button></div>
-    <div class="modal-player-list">${roles.map(role => `<div class="modal-player-item" data-action="select-role-for-slot" data-slot="${slotIndex}" data-position="${position}" data-role="${role}"><div class="modal-player-name">${role}</div></div>`).join('')}</div>`;
+  const translatedPosition = translatePosition(position);
+  content.innerHTML = `<div class="modal-header"><h3>${t('modals.selectRoleForPosition', { position: translatedPosition })}</h3><button class="modal-close" data-action="close-modal">×</button></div>
+    <div class="modal-player-list">${roles.map(role => `<div class="modal-player-item" data-action="select-role-for-slot" data-slot="${slotIndex}" data-position="${position}" data-role="${role}"><div class="modal-player-name">${translateRole(role)}</div></div>`).join('')}</div>`;
   document.body.appendChild(modal); modal.classList.add('active');
 }
 
 // New function to show player list with role-specific rating
 function showPlayerListForSlot(slotIndex, position, role) {
   const available = state.players.filter(p => getPlayerPositions(p).includes(position) && !state.lineup.find(l => l.playerId === p.id));
+  const translatedPosition = translatePosition(position);
   if (!available.length) { 
-    alert(`No available ${position} players.`); 
+    alert(t('lineupSection.noAvailablePlayers', { position: translatedPosition })); 
     return; 
   }
   
@@ -431,18 +438,20 @@ function showPlayerListForSlot(slotIndex, position, role) {
   
   const modal = createModal();
   const content = modal.querySelector('.modal-content');
-  const roleText = role ? ` - ${role}` : '';
+  const translatedRole = role ? translateRole(role) : '';
+  const modalTitle = role ? t('modals.selectPlayerWithRole', { position: translatedPosition, role: translatedRole }) : t('modals.selectPlayer', { position: translatedPosition });
   
   // Create player items HTML
   const renderPlayerItems = (players) => {
     return players.map(({ player, rating }) => {
-      return `<div class="modal-player-item" data-action="assign-player-with-role" data-player="${player.id}" data-slot="${slotIndex}" data-role="${role || ''}" data-player-name="${player.name.toLowerCase()}"><div class="modal-player-name">${player.name}</div><div class="modal-player-info"><span>${getPlayerPositions(player).join(', ')}</span><span>Rating: ${rating}</span></div></div>`;
+      const playerPositions = getPlayerPositions(player).map(p => translatePosition(p)).join(', ');
+      return `<div class="modal-player-item" data-action="assign-player-with-role" data-player="${player.id}" data-slot="${slotIndex}" data-role="${role || ''}" data-player-name="${player.name.toLowerCase()}"><div class="modal-player-name">${player.name}</div><div class="modal-player-info"><span>${playerPositions}</span><span>${t('squadSection.rating')}: ${rating}</span></div></div>`;
     }).join('');
   };
   
-  content.innerHTML = `<div class="modal-header"><h3>Select ${position} Player${roleText}</h3><button class="modal-close" data-action="close-modal">×</button></div>
+  content.innerHTML = `<div class="modal-header"><h3>${modalTitle}</h3><button class="modal-close" data-action="close-modal">×</button></div>
     <div class="modal-search-container">
-      <input type="text" class="modal-search-input" placeholder="Search player by name..." autocomplete="off">
+      <input type="text" class="modal-search-input" placeholder="${t('modals.searchPlaceholder')}" autocomplete="off">
     </div>
     <div class="modal-player-list">${renderPlayerItems(playersWithRatings)}</div>`;
   document.body.appendChild(modal); 
@@ -490,7 +499,7 @@ function swapPlayers(a,b) {
   const p1 = state.players.find(p => p.id === as1.playerId); const p2 = state.players.find(p => p.id === as2.playerId);
   if (!p1 || !p2) return;
   const can1 = getPlayerPositions(p1).includes(pos2); const can2 = getPlayerPositions(p2).includes(pos1);
-  if (!can1 || !can2) { alert('Swap invalid: position incompatibility.'); return; }
+  if (!can1 || !can2) { alert(t('lineupSection.swapInvalid')); return; }
   as1.slotIndex = b; as2.slotIndex = a; saveData(); renderLineup();
 }
 
@@ -500,7 +509,7 @@ function movePlayerToEmptySlot(fromSlotIndex, toSlotIndex, targetPosition) {
   const player = state.players.find(p => p.id === assignment.playerId);
   if (!player) return;
   if (!getPlayerPositions(player).includes(targetPosition)) {
-    alert('Player cannot play in this position.');
+    alert(t('lineupSection.playerCannotPlay'));
     return;
   }
   assignment.slotIndex = toSlotIndex;
@@ -540,7 +549,7 @@ function editPlayer(id) {
 }
 
 function deletePlayer(id) {
-  if (!window.confirm('Delete player?')) return;
+  if (!window.confirm(t('squadSection.deleteConfirm'))) return;
   state.players = state.players.filter(p => p.id !== id);
   state.lineup = state.lineup.filter(l => l.playerId !== id);
   saveData(); renderSquad(); renderLineup();

@@ -1,6 +1,7 @@
 import { calculateRating } from '../services/rating.js';
 import { getPlayerPositions, state } from '../models/state.js';
 import { positionRoles } from '../config/roles.js';
+import { t, translateRole, translatePosition } from '../config/i18n.js';
 
 export function createModal() {
   const modals = document.querySelectorAll('.modal');
@@ -30,8 +31,8 @@ export function closeModal() {
 export function showPositionModal(player, slots, assignFn) {
   const modal = createModal();
   const content = modal.querySelector('.modal-content');
-  content.innerHTML = `<div class="modal-header"><h3>Select Position for ${player.name}</h3><button class="modal-close" data-action="close-modal">×</button></div>
-    <div class="modal-player-list">${slots.map(slot => `<div class="modal-player-item" data-action="assign-slot" data-player="${player.id}" data-slot="${slot.index}"><div class="modal-player-name">${slot.label}</div></div>`).join('')}</div>`;
+  content.innerHTML = `<div class="modal-header"><h3>${t('modals.selectPositionFor', { name: player.name })}</h3><button class="modal-close" data-action="close-modal">×</button></div>
+    <div class="modal-player-list">${slots.map(slot => `<div class="modal-player-item" data-action="assign-slot" data-player="${player.id}" data-slot="${slot.index}"><div class="modal-player-name">${translatePosition(slot.label)}</div></div>`).join('')}</div>`;
   document.body.appendChild(modal); modal.classList.add('active');
 }
 
@@ -40,8 +41,8 @@ export function showRoleSelectionModal(playerId, slotIndex, position, roles, ass
   if (!player) return;
   const modal = createModal();
   const content = modal.querySelector('.modal-content');
-  content.innerHTML = `<div class="modal-header"><h3>Select Role for ${player.name}</h3><button class="modal-close" data-action="close-modal">×</button></div>
-    <div class="modal-player-list">${roles.map(role => `<div class="modal-player-item" data-action="assign-role" data-player="${playerId}" data-slot="${slotIndex}" data-role="${role}"><div class="modal-player-name">${role}</div></div>`).join('')}</div>`;
+  content.innerHTML = `<div class="modal-header"><h3>${t('modals.selectRoleFor', { name: player.name })}</h3><button class="modal-close" data-action="close-modal">×</button></div>
+    <div class="modal-player-list">${roles.map(role => `<div class="modal-player-item" data-action="assign-role" data-player="${playerId}" data-slot="${slotIndex}" data-role="${role}"><div class="modal-player-name">${translateRole(role)}</div></div>`).join('')}</div>`;
   document.body.appendChild(modal); modal.classList.add('active');
 }
 
@@ -52,20 +53,21 @@ export function viewPlayerDetails(playerId) {
   if (!modal) return;
   const modalPlayerName = document.getElementById('modal-player-name');
   const modalDetails = document.getElementById('modal-player-details');
-  modalPlayerName.textContent = `${player.name} - Position Ratings`;
+  modalPlayerName.textContent = t('modals.positionRatings', { name: player.name });
   const playerPositions = getPlayerPositions(player);
   let detailsHTML = '';
   playerPositions.forEach(position => {
     const roles = positionRoles[position] || [];
-    detailsHTML += `<div class="position-section"><div class="position-header">${position}</div><div class="roles-grid">`;
+    const translatedPosition = translatePosition(position);
+    detailsHTML += `<div class="position-section"><div class="position-header">${translatedPosition}</div><div class="roles-grid">`;
     roles.forEach(role => {
       const rating = calculateRating(player, position, role);
       const ratingClass = rating >= 15 ? 'rating-excellent' : rating >= 10 ? 'rating-good' : rating >= 5 ? 'rating-average' : 'rating-poor';
-      detailsHTML += `<div class="role-card"><div class="role-name">${role}</div><div class="role-rating"><span class="rating-badge ${ratingClass}">${rating}</span></div></div>`;
+      detailsHTML += `<div class="role-card"><div class="role-name">${translateRole(role)}</div><div class="role-rating"><span class="rating-badge ${ratingClass}">${rating}</span></div></div>`;
     });
     detailsHTML += `</div></div>`;
   });
-  if (!detailsHTML) detailsHTML = '<p>No position data available for this player.</p>';
+  if (!detailsHTML) detailsHTML = `<p>${t('modals.noPositionData')}</p>`;
   modalDetails.innerHTML = detailsHTML;
   modal.classList.add('active');
 }
@@ -81,12 +83,13 @@ export function showRoleChangeModal(playerId, slotIndex, position) {
   
   const roles = positionRoles[position] || [];
   if (!roles.length) {
-    alert('No roles available for this position');
+    alert(t('modals.noRolesAvailable'));
     return;
   }
   
   const modal = createModal();
   const content = modal.querySelector('.modal-content');
+  const translatedPosition = translatePosition(position);
   
   // Calculate ratings for all roles
   const rolesWithRatings = roles.map(role => {
@@ -97,13 +100,13 @@ export function showRoleChangeModal(playerId, slotIndex, position) {
   });
   
   content.innerHTML = `<div class="modal-header">
-    <h3>Select Role for ${player.name} (${position})</h3>
+    <h3>${t('modals.selectRoleFor', { name: player.name })} (${translatedPosition})</h3>
     <button class="modal-close" data-action="close-modal">×</button>
   </div>
   <div class="modal-player-list">
     ${rolesWithRatings.map(({ role, rating, ratingClass }) => `
       <div class="modal-player-item" data-action="update-role" data-slot="${slotIndex}" data-role="${role}">
-        <div class="modal-player-name">${role}</div>
+        <div class="modal-player-name">${translateRole(role)}</div>
         <div class="modal-player-info">
           <span class="rating-badge ${ratingClass}">${rating}</span>
         </div>
@@ -124,8 +127,10 @@ export function showPlayerChangeModal(slotIndex, position, currentRole) {
     return canPlayPosition && notInLineup;
   });
   
+  const translatedPosition = translatePosition(position);
+  
   if (!available.length) {
-    alert(`No available ${position} players.`);
+    alert(t('lineupSection.noAvailablePlayers', { position: translatedPosition }));
     return;
   }
   
@@ -147,25 +152,29 @@ export function showPlayerChangeModal(slotIndex, position, currentRole) {
   
   const modal = createModal();
   const content = modal.querySelector('.modal-content');
-  const roleText = currentRole ? ` - ${currentRole}` : '';
+  const translatedRole = currentRole ? translateRole(currentRole) : '';
+  const modalTitle = currentRole ? t('modals.selectPlayerWithRole', { position: translatedPosition, role: translatedRole }) : t('modals.selectPlayer', { position: translatedPosition });
   
   content.innerHTML = `<div class="modal-header">
-    <h3>Select ${position} Player${roleText}</h3>
+    <h3>${modalTitle}</h3>
     <button class="modal-close" data-action="close-modal">×</button>
   </div>
   <div class="modal-search-container">
-    <input type="text" class="modal-search-input" placeholder="Search player by name..." autocomplete="off">
+    <input type="text" class="modal-search-input" placeholder="${t('modals.searchPlaceholder')}" autocomplete="off">
   </div>
   <div class="modal-player-list">
-    ${playersWithRatings.map(({ player, rating, ratingClass }) => `
+    ${playersWithRatings.map(({ player, rating, ratingClass }) => {
+      const playerPositions = getPlayerPositions(player).map(p => translatePosition(p)).join(', ');
+      return `
       <div class="modal-player-item" data-action="replace-player" data-player="${player.id}" data-slot="${slotIndex}" data-role="${currentRole || ''}" data-player-name="${player.name.toLowerCase()}">
         <div class="modal-player-name">${player.name}</div>
         <div class="modal-player-info">
-          <span>${getPlayerPositions(player).join(', ')}</span>
+          <span>${playerPositions}</span>
           <span class="rating-badge ${ratingClass}">${rating}</span>
         </div>
       </div>
-    `).join('')}
+    `;
+    }).join('')}
   </div>`;
   
   document.body.appendChild(modal);
